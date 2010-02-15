@@ -9,15 +9,14 @@ import os
 import CaptchasDotNet
 
 def sign_pseudonym(pseudonym):
-    pseudonym += time.time()
+    pseudonym += str(time.time()).strip()
     return pseudonym
-    
+
 def create_pseudonym():
     process = os.popen("makepasswd")
-    return process.read()
-    
+    return process.read().strip()
+
 def create_captcha():
-    ''' Returns a captcha in HTML '''
     captchas = CaptchasDotNet.CaptchasDotNet (
                                 client   = 'demo', 
                                 secret   = 'secret'#,
