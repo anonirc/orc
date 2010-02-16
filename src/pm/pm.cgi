@@ -9,6 +9,7 @@ import os
 import CaptchasDotNet
 
 def sign_pseudonym(pseudonym):
+    ''' Takes a pseudonym and signs it using some GPG magic and timestamp. '''
     pseudonym += str(time.time()).strip()
     return pseudonym
 
@@ -19,14 +20,10 @@ def create_pseudonym():
 def create_captcha():
     captchas = CaptchasDotNet.CaptchasDotNet (
                                 client   = 'demo', 
-                                secret   = 'secret'#,
-                                #alphabet = 'abcdefghkmnopqrstuvwxyz',
-                                #letters  = 6,
-                                #width    = 240,
-                                #height   = 80
+                                secret   = 'secret'
                                 )    
     captcha = '''
-    <form method="get" action="index.cgi">
+    <form method="get" action="pm.cgi">
     <table>
       <tr>
         <td>
@@ -63,9 +60,7 @@ def create_captcha():
 def validate_captcha():
     captchas = CaptchasDotNet.CaptchasDotNet (
                                 client   = 'demo',
-                                secret   = 'secret'#,
-                                #alphabet = 'abcdefghkmnopqrstuvwxyz',
-                                #letters  = 6
+                                secret   = 'secret'
                                 )
 
     # Read the form values and keep empty fields.
