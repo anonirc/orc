@@ -14,6 +14,7 @@ def sign_pseudonym(pseudonym):
     return pseudonym
 
 def create_pseudonym():
+    ''' For now just returns a random string. '''
     process = os.popen("makepasswd")
     return process.read().strip()
 
@@ -95,7 +96,6 @@ def validate_captcha():
     return True
 
 
-#def index(req):
 def index():
     """ Return the user interface for the pseudonym manager in HTML """
     # Display error messages in browser for easy debugging
