@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # coding=UTF-8
 
-import sys
-import time
 import cgi
 import os
+import sys
+import time
 
 import CaptchasDotNet
 
 def sign_pseudonym(pseudonym):
-    ''' Takes a pseudonym and signs it using some GPG magic and timestamp. '''
+    ''' Takes a pseudonym and signs it using some GPG and timestamp magic '''
     pseudonym += str(time.time()).strip()
     return pseudonym
 
@@ -18,6 +18,7 @@ def create_pseudonym():
     return process.read().strip()
 
 def create_captcha():
+    ''' Returns the HTML for a captcha '''
     captchas = CaptchasDotNet.CaptchasDotNet (
                                 client   = 'demo', 
                                 secret   = 'secret'
