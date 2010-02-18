@@ -1,0 +1,56 @@
+PseudonymManager by Runa Sandvik <runa.sandvik@gmail.com>
+
+This is a set of scripts that shows a user a CAPTCHA and, upon entering
+the correct set of letters, returns the output of a file that is signed
+with GPG and contains a random string.
+
+The scripts have been tested with Python 2.5.5.
+
+CaptchasDotNet:
+
+    This is a Python module for easy utilization of http://captchas.net.
+
+gpgsign:
+
+    Creates a file with a random string, signs the file using 'gpg
+    --clearsign' and then saves the output in the original file.
+
+show_captcha:
+
+    This script will simply show a user a CAPTCHA.
+
+verify_captcha:
+
+   This script will verify the string entered by the user. If the right
+   CAPTCHA has been entered, the script will run gpgsign.py and then
+   return the output of the signed file to the user.
+
+Before configuring the scripts, you will need to do the following:
+
+    - Enable cgi in Apache
+    - Register on https://captchas.net to obtain your own secret key
+    - Install python-gnupginterface
+    - Generate a GPG key pair if you haven't done so already
+
+To configure the scripts:
+
+gpgsign:
+
+   - Set the name of the file you wish to write the random string to
+   - Set the location of the .gnupg directory
+   - Set the secret passphrase of the GPG key
+
+show_captcha:
+
+    - Rename from .py to .cgi
+    - Set the correct values for 'client' and 'secret'
+
+verify_captcha:
+
+    - Rename from .py to .cgi
+    - Set the correct values for 'client' and 'secret'
+    - Set the path to gpgsign.py
+
+The four scripts, and the .gnupg directory, need to be owned by the
+Apache user (usually www-data). In addition to that, the four scripts
+need to have the execute bit set.
