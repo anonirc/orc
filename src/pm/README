@@ -1,4 +1,5 @@
-PseudonymManager by Runa Sandvik <runa.sandvik@gmail.com>
+The documentation for PseudonymManager is written by Runa Sandvik
+<runa.sandvik@gmail.com>.
 
 This is a set of scripts that shows a user a CAPTCHA and, upon entering
 the correct set of letters, returns the output of a file that is signed
@@ -6,31 +7,101 @@ with GPG and contains a random string.
 
 The scripts have been tested with Python 2.5.5.
 
-CaptchasDotNet:
+1. General information about the scripts
 
-    This is a Python module for easy utilization of http://captchas.net.
+    1.1 CaptchasDotNet:
 
-gpgsign:
+        This is a Python module for easy utilization of http://captchas.net.
 
-    Creates a file with a random string, signs the file using 'gpg
-    --clearsign' and then saves the output in the original file.
+    1.2 gpgsign:
 
-show_captcha:
+        Creates a file with a random string, signs the file using 'gpg
+        --clearsign' and then saves the output in the original file.
 
-    This script will simply show a user a CAPTCHA.
+    1.3 show_captcha:
+    
+        This script will simply show a user a CAPTCHA.
 
-verify_captcha:
+    1.4 verify_captcha:
 
-   This script will verify the string entered by the user. If the right
-   CAPTCHA has been entered, the script will run gpgsign.py and then
-   return the output of the signed file to the user.
+        This script will verify the string entered by the user. If the right
+        CAPTCHA has been entered, the script will run gpgsign.py and then
+        return the output of the signed file to the user.
+
+2. Prerequisites
+
+    2.1 Register on https://captchas.net
+    
+   	 Register on the website to obtain your own secret key. You will need to
+	 specify your user name and your key in both show_captcha and
+         verify_captcha.
+
+    2.2 Install GnuPGInterface
+        
+	GnuPGInterface is a Python module for GnuPG. The module is available in
+	both Debian and Ubuntu as python-gnupginterface. You can also download
+        it from http://py-gnupg.sourceforge.net/.
+
+    2.3 Create a GPG key
+
+	If you do not have a GPG key, you will need to create one in order for
+	gpgsign to work. The program to use, gnupg, is installed by default on
+        both Debian and Ubuntu.
+
+        What follows is a list of the commands and actions taken to create a GPG
+        key. The key we are creating here is used for signing only, which is
+        fine since we do not need to encrypt or decrypt messages.
+
+        $ gpg --gen-key
+        gpg (GnuPG) 1.4.9; Copyright (C) 2008 Free Software Foundation, Inc.
+        This is free software: you are free to change and redistribute it. There
+        is NO WARRANTY, to the extent permitted by law.
+
+        Please select what kind of key you want:
+           (1) DSA and Elgamal (default)
+           (2) DSA (sign only)
+           (5) RSA (sign only)
+        Your selection? 5
+        RSA keys may be between 1024 and 4096 bits long.
+        What keysize do you want? (2048) 4096
+        Requested keysize is 4096 bits
+        Please specify how long the key should be valid.
+                 0 = key does not expire
+              <n>  = key expires in n days
+              <n>w = key expires in n weeks
+              <n>m = key expires in n months
+              <n>y = key expires in n years
+        Key is valid for? (0) 0
+        Key does not expire at all
+        Is this correct? (y/N) y
+
+        You need a user ID to identify your key; the software constructs the
+        user ID from the Real Name, Comment and Email Address in this form:
+        "Heinrich Heine (Der Dichter) <heinrichh@duesseldorf.de>"
+        
+        Real name: One Example
+        Email address: example@foo.com
+        Comment: 
+        You selected this USER-ID:
+            "One Example <example@foo.com>"
+
+        Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit? O
+
+	At this point you will be asked to enter a passphrase to protect your
+	secret key. Enter the chosen passphrase twice. The program will then
+	generate a lot of random bytes while creating your public and secret
+	key. When it is finished, you will find your keys in the ~/.gnupg
+        directory.
+
+    2.3 Set up your Apache web server with CGI
+
+	If you have not set up Apache with CGI, you will need to do so now.
+	This is because both show_captcha and verify_captcha will run as CGI
+        scripts.
 
 Before configuring the scripts, you will need to do the following:
 
     - Enable cgi in Apache
-    - Register on https://captchas.net to obtain your own secret key
-    - Install python-gnupginterface
-    - Generate a GPG key pair if you haven't done so already
 
 To configure the scripts:
 
