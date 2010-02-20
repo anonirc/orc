@@ -33,19 +33,19 @@ The scripts have been tested with Python 2.5.5.
     
    	 Register on the website to obtain your own secret key. You will need to
 	 specify your user name and your key in both show_captcha and
-         verify_captcha.
+	verify_captcha.
 
     2.2 Install GnuPGInterface
         
 	GnuPGInterface is a Python module for GnuPG. The module is available in
 	both Debian and Ubuntu as python-gnupginterface. You can also download
-        it from http://py-gnupg.sourceforge.net/.
+	it from http://py-gnupg.sourceforge.net/.
 
     2.3 Create a GPG key
 
 	If you do not have a GPG key, you will need to create one in order for
 	gpgsign to work. The program to use, gnupg, is installed by default on
-        both Debian and Ubuntu.
+	both Debian and Ubuntu.
 
         What follows is a list of the commands and actions taken to create a GPG
         key. The key we are creating here is used for signing only, which is
@@ -89,14 +89,14 @@ The scripts have been tested with Python 2.5.5.
 	At this point you will be asked to enter a passphrase to protect your
 	secret key. Enter the chosen passphrase twice. The program will then
 	generate a lot of random bytes while creating your public and secret
-	key. When it is finished, you will find your keys in the ~/.gnupg
-        directory.
+	key. When it is	finished, you will find your keys in the ~/.gnupg
+	directory.
 
     2.3 Set up your Apache web server with CGI
 
 	If you have not set up Apache with CGI, you will need to do so now.
 	This is because both show_captcha and verify_captcha will run as CGI
-        scripts.
+	scripts.
 
 Before configuring the scripts, you will need to do the following:
 
