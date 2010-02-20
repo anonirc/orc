@@ -31,8 +31,8 @@ The scripts have been tested with Python 2.5.5.
 
     2.1 Register on https://captchas.net
     
-   	 Register on the website to obtain your own secret key. You will need to
-	 specify your user name and your key in both show_captcha and
+	Register on the website to obtain your own secret key. You will need to
+	specify your user name and your key in both show_captcha and
 	verify_captcha.
 
     2.2 Install GnuPGInterface
