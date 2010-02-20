@@ -1,5 +1,4 @@
-The documentation for PseudonymManager is written by Runa Sandvik
-<runa.sandvik@gmail.com>.
+This documentation is written by Runa Sandvik <runa.sandvik@gmail.com>.
 
 This is a set of scripts that shows a user a CAPTCHA and, upon entering
 the correct set of letters, returns the output of a file that is signed
