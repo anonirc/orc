@@ -21,7 +21,7 @@ gnupg = GnuPGInterface.GnuPG()
 ### Start config ###
 
 # Tell gnupg where to find the GPG keyring. That is, the .gnupg
-# directory.
+# directory. Do not add the trailing slash.
 gnupg.options.homedir = ""
 
 # The secret passphrase of the GPG key.
