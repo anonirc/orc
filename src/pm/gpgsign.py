@@ -20,11 +20,6 @@ gnupg = GnuPGInterface.GnuPG()
 
 ### Start config ###
 
-# Define the file that will contain the random string and later be
-# signed with GPG. You may want to give the file the ending .asc, but
-# this is not required.
-randstr_file = ""
-
 # Tell gnupg where to find the GPG keyring. That is, the .gnupg
 # directory.
 gnupg.options.homedir = ""
@@ -45,8 +40,14 @@ letters += letters.upper () + "0123456789"
 # The random starts out empty, then 40 random possible characters are
 # appended.
 randstr = "Random string: "
-for i in range (40):
+for i in range(40):
 	randstr += random.choice(letters)
+
+# Write the random string to a file so that it can be signed with GPG
+# later. The file, with a random name, will be written to /tmp.
+randstr_file ="/tmp/"
+for i in range(10):
+	randstr_file += random.choice(letters)
 
 # Write random string to file
 with open(randstr_file, 'w') as write_randstr:
