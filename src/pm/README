@@ -5,7 +5,7 @@ the correct set of letters, returns the output of a file that is signed
 with GPG and contains a random string. This document also lists the
 necessary prerequisites and how to configure the scripts.
 
-The scripts have been tested with Python 2.5.5.
+The scripts have been tested with Python 2.5.2.
 
 1. General information about the scripts
    
@@ -47,13 +47,22 @@ The scripts have been tested with Python 2.5.5.
     2.3 Create a GPG key
 
 	If you do not have a GPG key, you will need to create one in
-	order for gpgsign to work. See the HOWTO for more information.
+	order for gpgsign to work. See Section 1 in the HOWTO for more
+	information.
 
     2.4 Set up your Apache web server with CGI
 
 	If you have not set up Apache with CGI, you will need to do so
 	now. This is because both show_captcha and verify_captcha will
-	run as CGI programs. See the HOWTO for more information.
+	run as CGI programs. See Section 2 in the HOWTO for more
+	information.
+
+    2.5 File permissions
+
+        In order for the web server to access and run the CGI programs,
+	the right permissions will have to be set for the Apache user.
+	The Apache user will also require access to your GPG key. See
+	Section 3 in the HOWTO for more information.
 
 3. Configure the scripts
 
@@ -65,15 +74,15 @@ The scripts have been tested with Python 2.5.5.
 	You need to set the location of the .gnupg directory, as well as
 	the secret passphrase of the GPG key.
 
-    3.2 show_captcha.cgi
+    3.2 show_captcha.py
 
 	You need to set the correct values for 'client' and 'secret'.
 	That is, the user and key you obtained when you registered on
-	captchas.net.
+	captchas.net. You should also rename the file from .py to .cgi.
 
     3.3 verify_captcha.cgi
 
 	You need to set the correct values for 'client' and 'secret'.
 	That is, the user and key you obtained when you registered on
 	captchas.net. In addition to that, you also need to set the path
-	to gpgsign.py.
+	to gpgsign.py. You should also rename the file from .py to .cgi.
