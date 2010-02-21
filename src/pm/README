@@ -2,8 +2,8 @@ This documentation is written by Runa Sandvik <runa.sandvik@gmail.com>.
 
 This is a set of scripts that shows a user a CAPTCHA and, upon entering
 the correct set of letters, returns the output of a file that is signed
-with GPG and contains a random string. This document also lists the necessary
-prerequisites and how to configure the scripts.
+with GPG and contains a random string. This document also lists the
+necessary prerequisites and how to configure the scripts.
 
 The scripts have been tested with Python 2.5.5.
 
@@ -11,7 +11,8 @@ The scripts have been tested with Python 2.5.5.
    
     1.1 CaptchasDotNet:
 
-        This is a Python module for easy utilization of https://captchas.net.
+	This is a Python module for easy utilization of
+	https://captchas.net.
 
     1.2 gpgsign:
 
@@ -25,38 +26,39 @@ The scripts have been tested with Python 2.5.5.
 
     1.4 verify_captcha:
 
-        This script will verify the string entered by the user. If the right
-        CAPTCHA has been entered, the script will run gpgsign.py and then
-        return the output of the signed file to the user.
+	This script will verify the string entered by the user. If the
+	right CAPTCHA has been entered, the script will run gpgsign.py
+	and then return the output of the signed file to the user.
 
 2. Prerequisites
 
     2.1 Register on https://captchas.net
     
-	Register on the website to obtain your own secret key. You will need to
-	specify your user name and your key in both show_captcha and
-	verify_captcha.
+	Register on the website to obtain your own secret key. You will
+	need to specify your user name and your key in both show_captcha
+	and verify_captcha.
 
     2.2 Install GnuPGInterface
         
-	GnuPGInterface is a Python module for GnuPG. The module is available in
-	both Debian and Ubuntu as python-gnupginterface. You can also download
-	it from http://py-gnupg.sourceforge.net/.
+	GnuPGInterface is a Python module for GnuPG. The module is
+	available in both Debian and Ubuntu as python-gnupginterface.
+	You can also download it from http://py-gnupg.sourceforge.net/.
 
     2.3 Create a GPG key
 
-	If you do not have a GPG key, you will need to create one in order for
-	gpgsign to work. See the HOWTO for more information.
+	If you do not have a GPG key, you will need to create one in
+	order for gpgsign to work. See the HOWTO for more information.
 
     2.4 Set up your Apache web server with CGI
 
-	If you have not set up Apache with CGI, you will need to do so now.
-	This is because both show_captcha and verify_captcha will run as CGI
-	programs. See the HOWTO for more information.
+	If you have not set up Apache with CGI, you will need to do so
+	now. This is because both show_captcha and verify_captcha will
+	run as CGI programs. See the HOWTO for more information.
 
 3. Configure the scripts
 
-	Now that everything is set up, it is time to configure the scripts.
+	Now that everything is set up, it is time to configure the
+	scripts.
 
     3.1 gpgsign.py
 
@@ -65,11 +67,13 @@ The scripts have been tested with Python 2.5.5.
 
     3.2 show_captcha.cgi
 
-	You need to set the correct values for 'client' and 'secret'. That is,
-	the user and key you obtained when you registered on captchas.net.
+	You need to set the correct values for 'client' and 'secret'.
+	That is, the user and key you obtained when you registered on
+	captchas.net.
 
     3.3 verify_captcha.cgi
 
-	You need to set the correct values for 'client' and 'secret'. That is,
-	the user and key you obtained when you registered on captchas.net. In
-	addition to that, you also need to set the path to gpgsign.py.
+	You need to set the correct values for 'client' and 'secret'.
+	That is, the user and key you obtained when you registered on
+	captchas.net. In addition to that, you also need to set the path
+	to gpgsign.py.
