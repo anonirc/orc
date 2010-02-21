@@ -2,15 +2,16 @@ This documentation is written by Runa Sandvik <runa.sandvik@gmail.com>.
 
 This is a set of scripts that shows a user a CAPTCHA and, upon entering
 the correct set of letters, returns the output of a file that is signed
-with GPG and contains a random string.
+with GPG and contains a random string. This document also lists the necessary
+prerequisites and how to configure the scripts.
 
 The scripts have been tested with Python 2.5.5.
 
 1. General information about the scripts
-
+   
     1.1 CaptchasDotNet:
 
-        This is a Python module for easy utilization of http://captchas.net.
+        This is a Python module for easy utilization of https://captchas.net.
 
     1.2 gpgsign:
 
@@ -44,83 +45,31 @@ The scripts have been tested with Python 2.5.5.
     2.3 Create a GPG key
 
 	If you do not have a GPG key, you will need to create one in order for
-	gpgsign to work. The program to use, gnupg, is installed by default on
-	both Debian and Ubuntu.
+	gpgsign to work. See the HOWTO for more information.
 
-        What follows is a list of the commands and actions taken to create a GPG
-        key. The key we are creating here is used for signing only, which is
-        fine since we do not need to encrypt or decrypt messages.
-
-        $ gpg --gen-key
-        gpg (GnuPG) 1.4.9; Copyright (C) 2008 Free Software Foundation, Inc.
-        This is free software: you are free to change and redistribute it. There
-        is NO WARRANTY, to the extent permitted by law.
-
-        Please select what kind of key you want:
-           (1) DSA and Elgamal (default)
-           (2) DSA (sign only)
-           (5) RSA (sign only)
-        Your selection? 5
-        RSA keys may be between 1024 and 4096 bits long.
-        What keysize do you want? (2048) 4096
-        Requested keysize is 4096 bits
-        Please specify how long the key should be valid.
-                 0 = key does not expire
-              <n>  = key expires in n days
-              <n>w = key expires in n weeks
-              <n>m = key expires in n months
-              <n>y = key expires in n years
-        Key is valid for? (0) 0
-        Key does not expire at all
-        Is this correct? (y/N) y
-
-        You need a user ID to identify your key; the software constructs the
-        user ID from the Real Name, Comment and Email Address in this form:
-        "Heinrich Heine (Der Dichter) <heinrichh@duesseldorf.de>"
-        
-        Real name: One Example
-        Email address: example@foo.com
-        Comment: 
-        You selected this USER-ID:
-            "One Example <example@foo.com>"
-
-        Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit? O
-
-	At this point you will be asked to enter a passphrase to protect your
-	secret key. Enter the chosen passphrase twice. The program will then
-	generate a lot of random bytes while creating your public and secret
-	key. When it is	finished, you will find your keys in the ~/.gnupg
-	directory.
-
-    2.3 Set up your Apache web server with CGI
+    2.4 Set up your Apache web server with CGI
 
 	If you have not set up Apache with CGI, you will need to do so now.
 	This is because both show_captcha and verify_captcha will run as CGI
-	scripts.
+	programs. See the HOWTO for more information.
 
-Before configuring the scripts, you will need to do the following:
+3. Configure the scripts
 
-    - Enable cgi in Apache
+	Now that everything is set up, it is time to configure the scripts.
 
-To configure the scripts:
+    3.1 gpgsign.py
 
-gpgsign:
+	You need to set the name of the file you wish to write the random
+	string to. You also need to set the location of the .gnupg directory
+	and the secret passphrase of the GPG key.
 
-   - Set the name of the file you wish to write the random string to
-   - Set the location of the .gnupg directory
-   - Set the secret passphrase of the GPG key
+    3.2 show_captcha.cgi
 
-show_captcha:
+	You need to set the correct values for 'client' and 'secret'. That is,
+	the user and key you obtained when you registered on captchas.net.
 
-    - Rename from .py to .cgi
-    - Set the correct values for 'client' and 'secret'
+    3.3 verify_captcha.cgi
 
-verify_captcha:
-
-    - Rename from .py to .cgi
-    - Set the correct values for 'client' and 'secret'
-    - Set the path to gpgsign.py
-
-The four scripts, and the .gnupg directory, need to be owned by the
-Apache user (usually www-data). In addition to that, the four scripts
-need to have the execute bit set.
+	You need to set the correct values for 'client' and 'secret'. That is,
+	the user and key you obtained when you registered on captchas.net. In
+	addition to that, you also need to set the path to gpgsign.py.
