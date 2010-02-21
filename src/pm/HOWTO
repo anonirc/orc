@@ -1,22 +1,22 @@
 This documentation is written by Runa Sandvik <runa.sandvik@gmail.com>.
 
-This document aims to explain how to create a GPG key and how to set up Apache
-with CGI.
+This document aims to explain how to create a GPG key and how to set up
+Apache with CGI.
 
 1. Create a GPG key
 
-    If you do not have a GPG key, you will need to create one in order for
-    gpgsign to work. The program to use, gnupg, is installed by default on both
-    Debian and Ubuntu.
+    If you do not have a GPG key, you will need to create one in order
+    for gpgsign to work. The program to use, gnupg, is installed by
+    default on both Debian and Ubuntu.
 
-    What follows is a list of the commands and actions taken to create a GPG
-    key. The key we are creating here is used for signing only, which is fine
-    since we do not need to encrypt or decrypt messages.
+    What follows is a list of the commands and actions taken to create a
+    GPG key. The key we are creating here is used for signing only,
+    which is fine since we do not need to encrypt or decrypt messages.
 
     $ gpg --gen-key
     gpg (GnuPG) 1.4.9; Copyright (C) 2008 Free Software Foundation, Inc.
-    This is free software: you are free to change and redistribute it. There
-    is NO WARRANTY, to the extent permitted by law.
+    This is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
 
     Please select what kind of key you want:
        (1) DSA and Elgamal (default)
@@ -48,11 +48,11 @@ with CGI.
 
     Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit? O
 
-    At this point you will be asked to enter a passphrase to protect your
-    secret key. Enter the chosen passphrase twice. The program will then
-    generate a lot of random bytes while creating your public and secret
-    key. When it is finished, you will find your keys in the ~/.gnupg
-    directory.
+    At this point you will be asked to enter a passphrase to protect
+    your secret key. Enter the chosen passphrase twice. The program will
+    then generate a lot of random bytes while creating your public and
+    secret key. When it is finished, you will find your keys in the
+    ~/.gnupg directory.
 
 2. Set up your Apache web server with CGI
 
@@ -60,9 +60,9 @@ with CGI.
     This is because both show_captcha and verify_captcha will run as CGI
     programs. Start with installing apache2.
 
-    CGI programs are often restricted to certain directories for security
-    reasons. You can use the ScriptAlias directive to tell Apache that a
-    certain directory is set aside for CGI programs.
+    CGI programs are often restricted to certain directories for
+    security reasons. You can use the ScriptAlias directive to tell
+    Apache that a certain directory is set aside for CGI programs.
 
     CGI programs have the extension .cgi, so you need to rename
     show_captcha.py and verify_captcha.py to show_captcha.cgi and
@@ -70,17 +70,38 @@ with CGI.
 
     2.1 Apache configuration file
 
-        To enable CGI, add the following lines to your Apache configuration
-	file:
+	To enable CGI, add the following lines to your Apache
+	configuration file:
 
         ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
         <Directory "/var/www">
             Options +ExecCGI
-            AddHandler cgi-script html
+            AddHandler cgi-script cgi
         </Directory>
 
 	For example, if http://localhost/cgi-bin/show_captcha.cgi is
 	requested, Apache will attempt to execute the file
 	/usr/lib/cgi-bin/show_captcha.cgi and return the output.
 
-    2.2 File permissions
+3. File permissions
+
+   In order for the web server to access and run the CGI programs, the
+   group www-data will need to have access to the files inside the
+   cgi-bin directory.
+
+   $ chgrp -R www-data /usr/lib/cgi-bin/*
+   $ chmod -R g=rx /usr/lib/cgi-bin/
+
+   The first command will set group ownership of the files in
+   /usr/lib/cgi-bin/ to www-data. The second command will give the group
+   permission to read and execute the files inside the directory.
+
+   The next step is to give www-data permission to read and write in
+   your .gnupg directory. It may be a good idea to give www-data its own
+   directory with the keys.
+
+   This is needed because one of the scripts use GPG to sign the file
+   containing the random string. Because gnupg is a bit picky (and with
+   good reason), www-data will need to own the whole directory as well.
+
+   $ chown -R www-data /path/to/your/.gnupg
