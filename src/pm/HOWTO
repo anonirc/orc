@@ -56,32 +56,32 @@ Apache with CGI.
 
 2. Set up your Apache web server with CGI
 
-    If you have not set up Apache with CGI, you will need to do so now.
-    This is because both show_captcha and verify_captcha will run as CGI
-    programs. Start with installing apache2.
+   If you have not set up Apache with CGI, you will need to do so now.
+   This is because both show_captcha and verify_captcha will run as CGI
+   programs. Start with installing apache2.
 
-    CGI programs are often restricted to certain directories for
-    security reasons. You can use the ScriptAlias directive to tell
-    Apache that a certain directory is set aside for CGI programs.
+   CGI programs are often restricted to certain directories for
+   security reasons. You can use the ScriptAlias directive to tell
+   Apache that a certain directory is set aside for CGI programs.
 
-    CGI programs have the extension .cgi, so you need to rename
-    show_captcha.py and verify_captcha.py to show_captcha.cgi and
-    verify_captcha.cgi.
+   CGI programs have the extension .cgi, so you need to rename
+   show_captcha.py and verify_captcha.py to show_captcha.cgi and
+   verify_captcha.cgi.
 
-    2.1 Apache configuration file
+   2.1 Apache configuration file
 
-	To enable CGI, add the following lines to your Apache
-	configuration file:
+       To enable CGI, add the following lines to your Apache
+       configuration file:
 
-        ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
-        <Directory "/var/www">
-            Options +ExecCGI
-            AddHandler cgi-script cgi
-        </Directory>
+       ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
+       <Directory "/var/www">
+           Options +ExecCGI
+           AddHandler cgi-script cgi
+       </Directory>
 
-	For example, if http://localhost/cgi-bin/show_captcha.cgi is
-	requested, Apache will attempt to execute the file
-	/usr/lib/cgi-bin/show_captcha.cgi and return the output.
+       For example, if http://localhost/cgi-bin/show_captcha.cgi is
+       requested, Apache will attempt to execute the file
+       /usr/lib/cgi-bin/show_captcha.cgi and return the output.
 
 3. File permissions
 
