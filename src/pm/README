@@ -7,6 +7,9 @@ necessary prerequisites and how to configure the scripts.
 
 The scripts have been tested with Python 2.5.2.
 
+To check out the code, write 'git clone
+git://github.com/anonirc/orc.git'.
+
 1. General information about the scripts
    
     1.1 CaptchasDotNet:
