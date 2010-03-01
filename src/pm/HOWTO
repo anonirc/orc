@@ -12,6 +12,7 @@ Apache with CGI.
     What follows is a list of the commands and actions taken to create a
     GPG key. The key we are creating here is used for signing only,
     which is fine since we do not need to encrypt or decrypt messages.
+    You are free to change the keysize should you wish to do so.
 
     $ gpg --gen-key
     gpg (GnuPG) 1.4.9; Copyright (C) 2008 Free Software Foundation, Inc.
@@ -70,14 +71,18 @@ Apache with CGI.
 
    2.1 Apache configuration file
 
-       To enable CGI, add the following lines to your Apache
-       configuration file:
+       To enable CGI you need to edit your Apache configuration file. If
+       you do not have one, you can put this information in
+       /etc/apache2/httpd.conf:
 
+       <VirtualHost *:80>
+       DocumentRoot "/var/www"
        ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
        <Directory "/var/www">
            Options +ExecCGI
            AddHandler cgi-script cgi
        </Directory>
+       </VirtualHost>
 
        For example, if http://localhost/cgi-bin/show_captcha.cgi is
        requested, Apache will attempt to execute the file
