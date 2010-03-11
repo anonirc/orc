@@ -47,8 +47,6 @@ class db:
         '''
         Removes a ban from the server.
         '''
-    
-        #TODO check if the ban is in the database perhaps?
         if(serverban):
             self.cursor.execute("DELETE FROM bandb WHERE pseudonym='" + pseudonym + "' AND serverban='" + serverban + \
                                 "' AND network='" + network + "'")
