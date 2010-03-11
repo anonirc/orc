@@ -61,8 +61,8 @@ class db:
         Called from remove_expired_bans when an expired ban is found
         Takes one argument, banid - removes that ban from the db and returns nothing.
         '''
-            self.cursor.execute("DELETE FROM bandb WHERE banid='" + str(banid) + "'")
-            return
+        self.cursor.execute("DELETE FROM bandb WHERE banid='" + str(banid) + "'")
+        return
         
     def remove_expired_bans(self):
         '''
