@@ -30,10 +30,10 @@ import time
 import MySQLdb #@UnresolvedImport
 
 class db:
-    '''
-    Creates the db object and initializes a connection to the mySQL database
-    '''
     def __init__(self):
+        '''
+        Creates the db object and initializes a connection to the mySQL database
+        '''
         # server will change once we have implemented a database server on the VM 
         self.server = "hauknes.org"
         self.con = MySQLdb.connect(host="hauknes.org", user="site_visitor", passwd="visitor",db="bandb")
@@ -42,10 +42,12 @@ class db:
         self.cursor.execute("INSERT INTO bandb (duration_mins, pseudonym, network, channel, serverban) VALUES (%s, %s, %s, %s, %s)", \
                             (duration, pseudonym, network, channel, serverban))
         return
-    '''
-    Removes a ban from the server.
-    '''
+    
     def remove_ban(self, pseudonym, network, channel, serverban):
+        '''
+        Removes a ban from the server.
+        '''
+    
         #TODO check if the ban is in the database perhaps?
         if(serverban):
             self.cursor.execute("DELETE FROM bandb WHERE pseudonym='" + pseudonym + "' AND serverban='" + serverban + \
@@ -54,19 +56,19 @@ class db:
             self.cursor.execute("DELETE FROM bandb WHERE pseudonym='" + pseudonym + "' AND channel='" + channel + \
                                 "' AND network='" + network + "'")
         return
-    '''
-    Called from remove_expired_bans when an expired ban is found
-    Takes one argument, banid - removes that ban from the db and returns nothing.
-    '''
     def remove_ban_id(self, banid):
+        '''
+        Called from remove_expired_bans when an expired ban is found
+        Takes one argument, banid - removes that ban from the db and returns nothing.
+        '''
             self.cursor.execute("DELETE FROM bandb WHERE banid='" + str(banid) + "'")
             return
-    '''
-    Iterates throught the bans and removes the one that has expired.
-    Takes no arguments and returns nothing.
-    '''
+        
     def remove_expired_bans(self):
-        #Unfinished
+        '''
+        Iterates throught the bans and removes the ones that has expired.
+        Takes no arguments and returns nothing.
+        '''
         self.cursor.execute("SELECT banid, unix_timestamp(timestamp), duration_mins FROM bandb")
         # Get the resultset as a tuple
         result = self.cursor.fetchall()
@@ -78,11 +80,11 @@ class db:
             if((record[1] + (record[2]*60) <  currentTime)):
                 self.remove_ban_id(record[0])
         return
-    '''
-    Prints the entire banlist database, primarily used for debugging.
-    Takes no arguments and returns nothing.
-    '''
     def print_db(self):
+        '''
+        Prints the entire banlist database, primarily used for debugging.
+        Takes no arguments and returns nothing.
+        '''
         self.cursor.execute("SELECT * FROM bandb")
         # Get the resultset as a tuple
         result = self.cursor.fetchall()
@@ -91,10 +93,10 @@ class db:
             print record[0] , "-->", record[1], "-->", record[2], "-->", record[3], "-->", record[4], "-->", record[5], "-->", record[6]
             
         return
-    '''
-    Closes the database connection to the server.
-    '''
     def close(self):
+        '''
+        Closes the database connection to the server.
+        '''
         self.con.close()
         return
     
