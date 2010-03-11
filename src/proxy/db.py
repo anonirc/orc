@@ -34,7 +34,7 @@ class db:
         '''
         Creates the db object and initializes a connection to the mySQL database
         '''
-        # server will change once we have implemented a database server on the VM 
+        # Server will change once we have implemented a database server on the VM 
         self.server = "hauknes.org"
         self.con = MySQLdb.connect(host="hauknes.org", user="site_visitor", passwd="visitor",db="bandb")
         self.cursor = self.con.cursor()
@@ -54,6 +54,7 @@ class db:
             self.cursor.execute("DELETE FROM bandb WHERE pseudonym='" + pseudonym + "' AND channel='" + channel + \
                                 "' AND network='" + network + "'")
         return
+    
     def remove_ban_id(self, banid):
         '''
         Called from remove_expired_bans when an expired ban is found
@@ -73,10 +74,11 @@ class db:
         # Iterate through resultset
         currentTime = time.time()
         for record in result:
-            #if the timestamp + duration is greater than current timestamp - remove the ban
+            # If the timestamp + duration is greater than current timestamp - remove the ban
             if((record[1] + (record[2]*60) <  currentTime)):
                 self.remove_ban_id(record[0])
         return
+    
     def print_db(self):
         '''
         Prints the entire banlist database, primarily used for debugging.
@@ -90,6 +92,7 @@ class db:
             print record[0] , "-->", record[1], "-->", record[2], "-->", record[3], "-->", record[4], "-->", record[5], "-->", record[6]
             
         return
+    
     def close(self):
         '''
         Closes the database connection to the server.
