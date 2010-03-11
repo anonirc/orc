@@ -22,7 +22,6 @@ mysql> describe bandb;
 +---------------+-------------+------+-----+-------------------+----------------+
 
 '''
-import datetime
 import time
 
 # This module relies on the module mysqldb
@@ -35,6 +34,7 @@ class db:
     Creates the db object and initializes a connection to the mySQL database
     '''
     def __init__(self):
+        # server will change once we have implemented a database server on the VM 
         self.server = "hauknes.org"
         self.con = MySQLdb.connect(host="hauknes.org", user="site_visitor", passwd="visitor",db="bandb")
         self.cursor = self.con.cursor()
@@ -43,6 +43,7 @@ class db:
                             (duration, pseudonym, network, channel, serverban))
         return
     '''
+    Removes a ban from the server.
     '''
     def remove_ban(self, pseudonym, network, channel, serverban):
         #TODO check if the ban is in the database perhaps?
@@ -54,16 +55,28 @@ class db:
                                 "' AND network='" + network + "'")
         return
     '''
+    Called from remove_expired_bans when an expired ban is found
+    Takes one argument, banid - removes that ban from the db and returns nothing.
+    '''
+    def remove_ban_id(self, banid):
+            self.cursor.execute("DELETE FROM bandb WHERE banid='" + str(banid) + "'")
+            return
+    '''
+    Iterates throught the bans and removes the one that has expired.
+    Takes no arguments and returns nothing.
     '''
     def remove_expired_bans(self):
-        self.cursor.execute("SELECT * FROM bandb")
+        #Unfinished
+        self.cursor.execute("SELECT banid, unix_timestamp(timestamp), duration_mins FROM bandb")
         # Get the resultset as a tuple
         result = self.cursor.fetchall()
         # Iterate through resultset
         currentTime = time.time()
+        print currentTime
         for record in result:
-            print "lol"
-        
+            #if the timestamp + duration is greater than current timestamp - remove the ban
+            if((record[1] + (record[2]*60) <  currentTime)):
+                self.remove_ban_id(record[0])
         return
     '''
     Prints the entire banlist database, primarily used for debugging.
@@ -73,10 +86,15 @@ class db:
         self.cursor.execute("SELECT * FROM bandb")
         # Get the resultset as a tuple
         result = self.cursor.fetchall()
-        n = datetime.datetime.now()
         # Iterate through resultset
         for record in result:
             print record[0] , "-->", record[1], "-->", record[2], "-->", record[3], "-->", record[4], "-->", record[5], "-->", record[6]
-            timenow = n.timetuple(record[1])
-            print "timetubple = " + str(timenow) 
+            
+        return
+    '''
+    Closes the database connection to the server.
+    '''
+    def close(self):
+        self.con.close()
+        return
     
