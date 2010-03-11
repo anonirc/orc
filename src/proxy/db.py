@@ -72,7 +72,6 @@ class db:
         result = self.cursor.fetchall()
         # Iterate through resultset
         currentTime = time.time()
-        print currentTime
         for record in result:
             #if the timestamp + duration is greater than current timestamp - remove the ban
             if((record[1] + (record[2]*60) <  currentTime)):
