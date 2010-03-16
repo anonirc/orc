@@ -33,12 +33,10 @@ class Orcbot:
         self.validated_users
         self.parent = parent
         #self.gpgverifier = verify_sign 
-    def validate_pseudonym(self, pseudonym, certificate):
+    def validate_pseudonym(self, pseudonym):
         '''
-        Shamelesslys stolen Runa's code and fitted it for Orcbot
         Takes the argument pseudonym and performs validation on the 
         pseudonym against the cert.
-        # TODO test and debug
         '''                
         # Define GnuPGInterface
         gnupg = GnuPGInterface.GnuPG()
@@ -93,19 +91,19 @@ class Orcbot:
     
         # The signature can not be checked if the public key is not found
         if "public key not found" in signature:
-            print "It seems like the key has not been imported"
+            #print "It seems like the key has not been imported"
             return False
     
         # Check if the signature is valid. Do not accept a bad signature.
         if "BAD" in signature:
-            print "Sorry, this signature is not valid"
+            #print "Sorry, this signature is not valid"
             return False
         
         # Accept a good signature if it is signed by the right key ID. If it
         # is a good signature, and the right key ID have been used, check
         # when the signature was made.
         if "Good" in signature and keyid in s[14]:
-                print "Good signature made", s[4], s[5], s[6], s[7], s[8], s[9]
+                #print "Good signature made", s[4], s[5], s[6], s[7], s[8], s[9]
                 return True
         
 
