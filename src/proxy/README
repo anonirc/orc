@@ -1,0 +1,14 @@
+This documentation is written by Runa Sandvik <runa.sandvik@gmail.com>.
+
+To check out the code, write 'git clone
+git://github.com/anonirc/orc.git'.
+
+1. General information about the scripts
+
+2. Prerequisites
+
+    2.1 Install Python IRC Library
+
+	This library is intended to encapsulate the IRC protocol. The
+	library is available in both Debian and Ubuntu as python-irclib.
+	You can also download it from http://python-irclib.sourceforge.net/
