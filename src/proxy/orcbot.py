@@ -23,17 +23,22 @@ import random
 from ircbot import SingleServerIRCBot
 from irclib import nm_to_n, nm_to_h, irc_lower, ip_numstr_to_quad, ip_quad_to_numstr
 
-#import verify_sign
-# I have not gotten Runa's code to run yet, we'll solve it tomorrow.
-class Orcbot:
-    def __init__(self, parent):
+import validated_users
+
+class OrcBot:
+    def __init__(self, keyring_loc, key_id):
+        '''
+        Initializes the OrcBot object.
+        Takes arguments keyring_loc, and key id, used by gnupg for the validation process
+        '''
         # This dict establishes whether a user is currently undergoing a validation process
         self.validation_in_progress = dict()
-        # This dictionary contains the validated users, an
-        self.validated_users
-        self.parent = parent
-        #self.gpgverifier = verify_sign 
-    def validate_pseudonym(self, pseudonym):
+        self.keyring_location = keyring_loc
+        self,key_id = key_id
+        # Creates the validated users as a child process of OrcBot for now
+        self.validated_users = validated_users()
+        
+    def validate_pseudonym(self, user_input):
         '''
         Takes the argument pseudonym and performs validation on the 
         pseudonym against the cert.
@@ -45,24 +50,14 @@ class Orcbot:
         
         # Tell gnupg where to find the GPG keyring. That is, the .gnupg
         # directory. Do not add the trailing slash.
-        gnupg.options.homedir = ""
+        gnupg.options.homedir = self.keyring_location
         
         # The ID of the key that was used to sign the user input.
-        keyid = ""
+        keyid = self.key_id
         
         ### End config ###
         
         """Verify signature of user input using GPG"""
-        # Read signature from user input
-        user_input = []
-        entry = raw_input("Enter signature, 'done' on its own line when you are finished: \n")
-        #while entry != "done":
-        #    user_input.append(entry)
-        #    entry = raw_input("")
-        #user_input = '\n'.join(user_input)
-        
-        #overwrites the while loop
-        user_input = pseudonym
         
         # Write user input to a random file in /tmp, so that the signature
         # can be verified later on. Use small letters, big letters and
@@ -106,7 +101,6 @@ class Orcbot:
                 #print "Good signature made", s[4], s[5], s[6], s[7], s[8], s[9]
                 return True
         
-
     def get_certificate(self, cmd, nick):
         # Adds more of the pseudonym to the dictionary.
         self.validation_in_progress[nick] += cmd
@@ -155,7 +149,7 @@ class Orcbot:
         elif (cmd=="help connect"):
             c.privmsg(nick, "Connects you to an irc server of your choice.")
             c.privmsg(nick, "The command may take one or two arguments, servername and port")
-            c.privmsg(nick, "If no port is defined, the command wil try connecting on the standard port.")
+            c.privmsg(nick, "If no port is defined, the command will try connecting on the standard port.")
             #TODO
         elif (cmd=="die"):
             # Used for debugging
@@ -171,10 +165,10 @@ class TestBot(SingleServerIRCBot):
     def __init__(self, channel="#it2901-tp", nickname="orcbot", server="irc.oftc.net", port=6667):
         SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
         self.channel = channel
-        '''
-        Adds the orcbot code to the testbot
-        '''
-        self.orc = Orcbot(self)
+        
+        # Adds the orcbot code to the testbot, needs to know where the GPG cert is
+        # TODO
+        self.orc = OrcBot("/home/???", "???")
 
     def on_nicknameinuse(self, c, e):
         c.nick(c.get_nickname() + "_")
@@ -206,9 +200,8 @@ class TestBot(SingleServerIRCBot):
     def do_command(self, e, cmd):
         nick = nm_to_n(e.source())
         c = self.connection
-        '''
-        Do command replaced by orcbot
-        '''
+        
+        # Do command replaced by orcbot
         self.orc.do_command(cmd, c, nick)
         
 def main():
