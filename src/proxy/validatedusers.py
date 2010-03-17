@@ -1,13 +1,12 @@
 import db
 
 class ValidatedUsers():
-    """ A class to hold the connections who are
+    '''
+    A class to hold the connections who are
     currently connected and whose pseudonyms have been validated
-    """
+    '''
     def __init__(self):
-        """
-        """
-        self.db = db()
+        #TODO work out communication by depending classes
         self.validated_users = dict()
     def add(self, connection, pseudonym):
         self.validated_users[pseudonym] = connection
@@ -19,6 +18,7 @@ class ValidatedUsers():
     '''
     '''
     def remove_disconnected_users(self):
+        # possible triggered by an event and may not need implementation
         return
         
         

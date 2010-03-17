@@ -29,15 +29,16 @@ import time
 # *nix source found at http://sourceforge.net/projects/mysql-python
 import MySQLdb #@UnresolvedImport
 
-class db:
+class BanHandler:
     def __init__(self):
         '''
-        Creates the db object and initializes a connection to the mySQL database
+        Creates the BanHandler object and initializes a connection to the mySQL database
         '''
         # Server will change once we have implemented a database server on the VM 
         self.server = "hauknes.org"
         self.con = MySQLdb.connect(host="hauknes.org", user="site_visitor", passwd="visitor",db="bandb")
         self.cursor = self.con.cursor()
+        
     def add_ban(self, duration, pseudonym, network, channel, serverban):
         self.cursor.execute("INSERT INTO bandb (duration_mins, pseudonym, network, channel, serverban) VALUES (%s, %s, %s, %s, %s)", \
                             (duration, pseudonym, network, channel, serverban))
@@ -78,6 +79,7 @@ class db:
             if((record[1] + (record[2]*60) <  currentTime)):
                 self.remove_ban_id(record[0])
         return
+    
     def is_banned_from_channel(self,pseudonym,server,channel):
         '''
         Takes three arguments, pseudonym, server and channel
