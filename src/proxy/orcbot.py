@@ -23,9 +23,9 @@ import random
 from ircbot import SingleServerIRCBot
 from irclib import nm_to_n, nm_to_h, irc_lower, ip_numstr_to_quad, ip_quad_to_numstr
 
-import validated_users
+from proxy.validated_users import ValidatedUsers
 
-class OrcBot:
+class ORCBot:
     def __init__(self, keyring_loc, key_id):
         '''
         Initializes the OrcBot object.
@@ -36,7 +36,7 @@ class OrcBot:
         self.keyring_location = keyring_loc
         self,key_id = key_id
         # Creates the validated users as a child process of OrcBot for now
-        self.validated_users = validated_users()
+        self.validated_users = ValidatedUsers()
         
     def validate_pseudonym(self, user_input):
         '''
@@ -101,7 +101,7 @@ class OrcBot:
                 #print "Good signature made", s[4], s[5], s[6], s[7], s[8], s[9]
                 return True
         
-    def get_certificate(self, cmd, nick):
+    def get_pseudonym_input(self, cmd, nick):
         # Adds more of the pseudonym to the dictionary.
         self.validation_in_progress[nick] += cmd
         
@@ -109,27 +109,31 @@ class OrcBot:
         '''
         Takes command input from the user an calls the corresponding logic
         '''
-        # If the nick is in the list, we collect data untill we receive "done" from the user
-        if(self.validation_in_progress.has_key(nick)): #Here we check if the nick is in the dictionary, 
+        # If the nick is in the dictionary of users currently undergoing validation, we collect 
+        # data till we receive "done" from the user
+        if(self.validation_in_progress.has_key(nick)):  
             # If it is it means that the nick is currently involved in a validation process. 
             if(cmd!="done"):
-                self.get_certificate(cmd,nick)
+                self.get_pseudonym_input(cmd,nick)
             else:
+                pseudonym = self.validation_in_progress.get(nick)
                 # Used for debugging
-                c.privmsg(nick, "Your certificate was retrieved, it was " + self.validation_in_progress.get(nick))
-                #TODO sanitize input
-                validation_result = self.validate_pseudonym(self.validation_in_progress.get(nick), certificate)
-                # We have a pseudonym or a empty string, remove the nick from the validation dictionary as that process is done
+                c.privmsg(nick, "Your certificate was retrieved, it was " + pseudonym)
+                #TODO sanitize input?
+                validation_result = self.validate_pseudonym(pseudonym)
+                # Remove nick from the validation process list
                 del self.validation_in_progress[nick]
                 if(validation_result):
-                    c.privmsg(nick, "Validation performed succesfully, you may now connect")
-                    #parent.add_pseudonym_to_validated_users()
-                    # TODO add to validated users and allow user to connect
+                    c.privmsg(nick, "Validation performed succesfully, you may now connect.")
+                    c.privmsg(nick, "For instructions type 'help connect'")
+                    # self.validated_users.add(connection, pseudonym)
+                    # TODO figure out how the connection or nick should be stored
                 else:
                     c.privmsg(nick, "Validation failed, check that you are using a valid pseudonym.")
         elif (cmd=="connect"):
-            #self.parent.validatedusers.haskey(nick)
-            return            
+            if(self.validated_users.haskey(nick)):
+                #TODO play with the ServerConnectionDaemon
+                return            
         elif (cmd=="help"):
             c.privmsg(nick, "Greetings, this bot support the following commands:")
             c.privmsg(nick, "help     - This dialog.")
@@ -168,7 +172,7 @@ class TestBot(SingleServerIRCBot):
         
         # Adds the orcbot code to the testbot, needs to know where the GPG cert is
         # TODO
-        self.orc = OrcBot("/home/???", "???")
+        self.orc = ORCBot("/home/???", "???")
 
     def on_nicknameinuse(self, c, e):
         c.nick(c.get_nickname() + "_")
@@ -201,7 +205,7 @@ class TestBot(SingleServerIRCBot):
         nick = nm_to_n(e.source())
         c = self.connection
         
-        # Do command replaced by orcbot
+        # Do command replaced by OrcBot
         self.orc.do_command(cmd, c, nick)
         
 def main():
