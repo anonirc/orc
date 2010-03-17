@@ -34,7 +34,7 @@ class ORCBot:
         # This dict establishes whether a user is currently undergoing a validation process
         self.validation_in_progress = dict()
         self.keyring_location = keyring_loc
-        self,key_id = key_id
+        self.key_id = key_id
         # Creates the validated users as a child process of OrcBot for now
         self.validated_users = ValidatedUsers()
         
