@@ -78,7 +78,20 @@ class db:
             if((record[1] + (record[2]*60) <  currentTime)):
                 self.remove_ban_id(record[0])
         return
-    
+    def is_banned_from_channel(self,pseudonym,server,channel):
+        '''
+        Takes three arguments, pseudonym, server and channel
+        Then returns a boolean value reflecting whether the user is banned
+        and connection to the channel should be denied
+        '''
+        #TODO
+    def is_banned_from_server(self,pseudonym,server):
+        '''
+        Takes two arguments, pseudonym and server.
+        Then returns a boolean value reflecting whether the user is banned
+        and connection to the channel should be denied
+        '''
+        #TODO
     def print_db(self):
         '''
         Prints the entire banlist database, primarily used for debugging.
@@ -96,6 +109,7 @@ class db:
     def close(self):
         '''
         Closes the database connection to the server.
+        Not likely to ever be used in a production enviroment.
         '''
         self.con.close()
         return
