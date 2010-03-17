@@ -1,5 +1,3 @@
-import db
-
 class ValidatedUsers():
     '''
     A class to hold the connections who are

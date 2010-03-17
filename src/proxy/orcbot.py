@@ -23,7 +23,7 @@ import random
 from ircbot import SingleServerIRCBot
 from irclib import nm_to_n, nm_to_h, irc_lower, ip_numstr_to_quad, ip_quad_to_numstr
 
-from proxy.validated_users import ValidatedUsers
+from validated_users import ValidatedUsers
 
 class ORCBot:
     def __init__(self, keyring_loc, key_id):
@@ -91,14 +91,14 @@ class ORCBot:
     
         # Check if the signature is valid. Do not accept a bad signature.
         if "BAD" in signature:
-            #print "Sorry, this signature is not valid"
+            print "Sorry, this signature is not valid"
             return False
         
         # Accept a good signature if it is signed by the right key ID. If it
         # is a good signature, and the right key ID have been used, check
         # when the signature was made.
         if "Good" in signature and keyid in s[14]:
-                #print "Good signature made", s[4], s[5], s[6], s[7], s[8], s[9]
+                print "Good signature made", s[4], s[5], s[6], s[7], s[8], s[9]
                 return True
         
     def get_pseudonym_input(self, cmd, nick):
