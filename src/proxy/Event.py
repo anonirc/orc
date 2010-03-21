@@ -12,6 +12,13 @@ class Event:
         self.data=data
         self.socket=source
 
+    def apply_handler(self):
+        #the code that calls the event handler for the event
+        #type
+        m = self.type()
+        if hasattr(self, m):
+            getattr(self, m)()
+
     def get_type(self):
         return self.type
    
@@ -27,5 +34,52 @@ class Event:
     def printC(self):
         print(self.type)
 
+    def error(self):
+        """TODO:
+        """
         
+    def join(self):
+        """TODO:
+        """
+                         
+    def kick(self):
+        """TODO
+        """
+    def mode(self):
+        """TODO
+        """
+        
+    def part(self):
+        """TODO
+        """
+        
+    def ping(self):
+        """TODO
+        """
+        
+    def privmsg(self):
+        """TODO
+        """
+        
+    def privnotice(self):
+        """TODO
+        """
+        
+    def pubmsg(self):
+        """TODO
+        """
+        
+    def pubnotice(self):
+        """TODO
+        """
+    def quit(self):
+        """TODO
+        """
+
+    def invite(self):
+        """TODO
+        """
+    def pong(self):
+        """TODO
+        """
 
