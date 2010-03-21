@@ -4,7 +4,7 @@ import thread
 import socket
 import string
 
-import irclib
+import ircParse as parse
 
 connections=[]
 
@@ -14,7 +14,7 @@ class IncomingConnectionDaemon(threading.Thread):
         """Threading.Thread does not like having it's __init__
         overridden, thus the necessity for a different init method
         """
-        self.host=host #socket.gethostname()
+        self.host=host
         self.port=port
         self.backlog=10
         self.size=1024
@@ -54,19 +54,11 @@ def look_for_events(host, connections):
     Arguments: host, connections
     """
     while 1:
-        #goes through connections and picks the first element, which is a socket object
-        clients = map(lambda x: x[0], connections)
-        #Filter out connection pairs where the socket object is equal to None
-        clients = filter(lambda x: x != None, clients)
-        if clients:
-            #maps over the client connections and tries to recv some data
-            datas = map(lambda x: x.recv(1024), clients)
-            #filters out where there is no new data
-            datas = filter(lambda x: x, datas)
-            #if there is any new data, do what follows
-            if datas:
-                #Whenever new data is discovered, this is where it
-                #is detected. For now it just prints all data received
-                print "Something found!"
-                for data in datas:
-                    print data
+        #goes through connections and calls ircParse's process_data
+        #on them, returning an Event object, or None
+        events=map(lambda x:parse.process_data(x), connections)
+        #filters out the None's, in other words the ones without new data
+        events=filter(lambda x:x!=None, events)
+        for e in events:
+            e.printC()
+        
