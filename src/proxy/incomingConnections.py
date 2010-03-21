@@ -1,8 +1,6 @@
-import sys
 import threading
 import thread
 import socket
-import string
 
 import ircParse as parse
 

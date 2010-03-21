@@ -1,10 +1,7 @@
 #Copies a lot from IRClib, adapted to be usable for making a bouncer
-import bisect
 import re
-import select
-import string
-
-from Event import *
+import socket
+import Event
 
 #Regex that groups the different parts of a IRC message.
 _rfc_1459_command_regexp = re.compile("^(:(?P<prefix>[^ ]+) +)?(?P<command>[^ ]+)( *(?P<argument> .+))?")

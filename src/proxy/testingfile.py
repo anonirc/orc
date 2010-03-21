@@ -1,10 +1,8 @@
-import sys
 import thread
 import socket
-import string
 import time
 
-from incomingConnections import *
+import incomingConnections as ic
 
 
 #settings for accepting connections
@@ -12,7 +10,7 @@ HOST=socket.gethostname()
 PORT=31337
 
 #starts the incoming connections daemon.
-daemon=IncomingConnectionDaemon()
+daemon=ic.IncomingConnectionDaemon()
 daemon.init(HOST, PORT)
 daemon.start()
 
