@@ -6,6 +6,7 @@ import time
 
 from incomingConnections import *
 
+
 #settings for accepting connections
 HOST=socket.gethostname()
 PORT=31337
