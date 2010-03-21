@@ -1,10 +1,8 @@
-
-
 class Event:
     """Holds the type and handler function for irc events
     """
 
-   def __init__(self, type, source, target, data=[]):
+    def __init__(self, type, source, target, data=[]):
         """Holds an event with event type, source, target,
         and optionally data needed for the event
         """
