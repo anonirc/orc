@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+# coding=UTF-8
 
 '''
 Created on 9. mars 2010
@@ -17,10 +18,12 @@ Communicastion to the proxy goes through system calls(proc),
 communication with the user goes through the IRC protocol
 '''
 # The with statement is not available in Python 2.5, so import it
-#from __future__ import with_statement
+from __future__ import with_statement
 import sys
-#import GnuPGInterface
-#import random
+
+import GnuPGInterface
+import random
+
 
 from ircbot import SingleServerIRCBot
 from irclib import nm_to_n
@@ -33,7 +36,7 @@ class ORCBot:
         Initializes the OrcBot object.
         Takes arguments keyring_loc, and key id - used by gnupg for the validation process
         '''
-        # The system calls are the bots communication with ORC proxy
+        # The system calls are the bot's communication with ORC proxy
         self.sc = SystemCalls()
         # This dictonary establishes whether a user is currently undergoing a validation process
         # Basicly if the user is present in the list, he is in a validation process
@@ -47,13 +50,13 @@ class ORCBot:
         self.banhandler= banhandler.BanHandler()
         # Starts an instance of SingleServerIRCBot from the irclib project with OrcBot as its parent
         self.irclibbot = IRCLibBot(self)
-    '''
-    TODO: Make this code work        
-    def validate_pseudonym(self, user_input):
-        #docstringstart
-        #Takes the argument pseudonym and performs validation on the 
-        #pseudonym against the cert.
-        #docstringend                
+    #TODO: Make this code work        
+    def validate_pseudonym(self, user_input, nick,c):
+        '''
+        Takes the argument pseudonym and performs validation on the 
+        pseudonym against the cert.
+        '''
+          
         # Define GnuPGInterface
         gnupg = GnuPGInterface.GnuPG()
         
@@ -65,7 +68,6 @@ class ORCBot:
         
         # The ID of the key that was used to sign the user input.
         keyid = self.key_id
-        
         ### End config ###
         
         """Verify signature of user input using GPG"""
@@ -75,7 +77,7 @@ class ORCBot:
         # digits for the filename.
         letters = "abcdefghijklmnopqrstuvwxyz"
         letters += letters.upper () + "0123456789"
-    
+
         # Actually write user input to file
         input_file = "/tmp/"
         for i in range(10):
@@ -89,7 +91,7 @@ class ORCBot:
         # Verify the signature
         clearsign = gnupg.run(['--no-tty'], ['--decrypt'],
         create_fhs=['stdout','stderr'], attach_fhs={'stdin': verify})
-    
+        
         # Read the output from gnupg, and split it into an array so that it
         # can be evaluated.
         signature = clearsign.handles['stderr'].read()
@@ -97,21 +99,25 @@ class ORCBot:
     
         # The signature can not be checked if the public key is not found
         if "public key not found" in signature:
-            print "It seems like the key has not been imported"
+            c.privmsg(nick, "Validation failed, It seems like the key has not been imported")
             return False
     
         # Check if the signature is valid. Do not accept a bad signature.
         if "BAD" in signature:
-            print "Sorry, this signature is not valid"
+            c.privmsg(nick, "Validation failed, Sorry, this signature is not valid")
             return False
         
         # Accept a good signature if it is signed by the right key ID. If it
         # is a good signature, and the right key ID have been used, check
         # when the signature was made.
         if "Good" in signature and keyid in s[14]:
-                print "Good signature made", s[4], s[5], s[6], s[7], s[8], s[9]
+                c.privmsg(nick, "Validation succeded, good signature made", s[4], s[5], s[6], s[7], s[8], s[9])
                 return True
-    '''
+            
+        # If none of Runa's if sentences has kicked in, let her know
+        c.privmsg(nick, "Validation failed, Sorry, I tried all you said, but reached end of method.")
+        return False
+
     def user_interaction(self, cmd, c, nick):
         '''
         This is the hub of user interaction in OrcBot
@@ -128,7 +134,9 @@ class ORCBot:
             self.validation_in_progress[nick] = ""
         elif (cmd=="connect"):
             if(self.validated_users.haskey(nick)):
-                #TODO: play with the ServerConnectionDaemon
+                #TODO: Figure out how OrcBot gets access to the validated users database 
+                # Can different threads share and object syncronized?
+                # This will likely be a system call
                 return            
         elif (cmd=="help"):
             c.privmsg(nick, "Greetings, this bot support the following commands:")
@@ -143,7 +151,7 @@ class ORCBot:
             c.privmsg(nick, "The process is concluded by typing 'done'. on a single line.")
             #TODO: Finish this method stub.
         elif (cmd=="help connect"):
-            c.privmsg(nick, "Connects øyou to an irc server of your choice.")
+            c.privmsg(nick, "Connects ï¿½you to an irc server of your choice.")
             c.privmsg(nick, "The command may take one or two arguments, servername and port")
             c.privmsg(nick, "If no port is defined, the command will try connecting on the standard port.")
             #TODO: Finish this method stub.
@@ -157,6 +165,10 @@ class ORCBot:
             c.notice(nick, "You wrote: '" + cmd + "' this is not a recognized command, try typing 'help'")
         
     def enter_pseudonym(self,nick,cmd,c):
+        '''
+        This function is called as long as the user is in the validation dictionary
+        and haven't finished their validation.
+        '''
         if(cmd!="done"):
             self.validation_in_progress[nick] += cmd
         else:
@@ -164,8 +176,7 @@ class ORCBot:
             # Used for debugging
             c.privmsg(nick, "Your certificate was retrieved, it was " + pseudonym)
             # TODO: sanitize input?
-            # Validation_result = self.validate_pseudonym(pseudonym)
-            validation_result = True
+            validation_result = self.validate_pseudonym(pseudonym,nick,c)
             # Remove nick from the validation process list
             del self.validation_in_progress[nick]
             if(validation_result):
@@ -183,13 +194,12 @@ class SystemCalls:
         return
             
 class IRCLibBot(SingleServerIRCBot):
-    def __init__(self, parent, channel="#it2901-tp", nickname="orcbot", server="localhost", port=6667):
+    def __init__(self, parent, nickname="orcbot", server="localhost", port=6667):
         self.orc = parent
         #TODO: Remove this, its for debug only, OrcBot will run on localhost of the proxy
         server="irc.oftc.net"
         SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
-        #TODO: Remove this, its for debug only, OrcBot will never join a channel
-        self.channel = channel
+
         print "Bot started.."
         self.start()
 
@@ -202,10 +212,6 @@ class IRCLibBot(SingleServerIRCBot):
         # from here OrcBot code takes over SingleServerIRCBot
         self.orc.user_interaction(e.arguments()[0], c, nm_to_n(e.source()))
         # self.orc.user_interaction(cmd, c, nick)
-        
-    def on_welcome(self, c, e):
-        #TODO: Remove this, its for debug only, OrcBot will never join a channel
-        c.join(self.channel)
                 
 def main():
     #TODO: Make this happen from config file
