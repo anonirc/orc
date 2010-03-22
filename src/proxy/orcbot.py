@@ -152,25 +152,25 @@ class ORCBot:
                       "commands:")
             con.privmsg(nick, "help     - This dialog.")
             con.privmsg(nick, "validate - Validate a pseudonym.")
-            con.privmsg(nick, "conect  - conect to an irc server. " + 
+            con.privmsg(nick, "conect  - connect to an irc server. " + 
                       "requires validation.")
             con.privmsg(nick, "join     - Join a channel. requires " + 
-                      "validation and a active server conection.")
+                      "validation and a active server connection.")
             con.privmsg(nick, "Type 'help <commandname>' to get more info" + 
                       "about each command.")
             
         elif (cmd=="help validate"):
-            con.privmsg(nick, "Validates a pseudonym, it makes the bot " + 
+            con.privmsg(nick, "Validates a pseudonym, it makes orcbot " + 
                       "temporarily accept any data you send it for validation.")
             con.privmsg(nick, "The process is concluded by typing 'done'. " + 
                       "on a single line.")
             #TODO: Finish this method stub.
-        elif (cmd=="help conect"):
-            con.privmsg(nick, "conects �you to an irc server of your choice.")
+        elif (cmd=="help connect"):
+            con.privmsg(nick, "Connects you to an IRC server of your choice.")
             con.privmsg(nick, "The command may take one or two arguments, "
                       + "servername and port")
             con.privmsg(nick, "If no port is defined, the command will try " + 
-                      "conecting on the standard port.")
+                      "connecting on the standard port.")
             #TODO: Finish this method stub.
         elif (cmd=="die"):
             #TODO: Remove this, its a debugging method
@@ -199,11 +199,11 @@ class ORCBot:
             # Remove nick from the validation process list
             del self.validation_in_progress[nick]
             if(validation_result):
-                con.privmsg(nick, "Validation performed succesfully, " + 
-                          "you may now conect.")
-                con.privmsg(nick, "For instructions type 'help conect'")
-                # self.validated_users.add(conection, pseudonym)
-                #TODO: Figure out how the conection or nick should be stored
+                con.privmsg(nick, "Validation performed successfully, " + 
+                          "you may now connect.")
+                con.privmsg(nick, "For instructions type 'help connect'")
+                # self.validated_users.add(connection, pseudonym)
+                #TODO: Figure out how the connection or nick should be stored
             else:
                 con.privmsg(nick, "Validation failed, check that you are " + 
                           "using a valid pseudonym.")
@@ -236,7 +236,7 @@ class IRCLibBot(SingleServerIRCBot):
     def __init__(self, parent, nickname ="orcbot", server ="localhost", 
                  port=6667):
         self.orc = parent
-        #TODO: Remove next lune, its for debug only, OrcBot will run on 
+        #TODO: Remove next line, its for debug only, OrcBot will run on 
         # localhost of the proxy
         server = "irc.oftc.net"
         SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
