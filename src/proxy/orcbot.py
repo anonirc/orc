@@ -140,7 +140,8 @@ class ORCBot:
             # Add to dictionary, add initialize the pseudonym as a string
             con.privmsg(nick, "Validation begun, paste your pseudonym now, " +
             "it is important that you paste the pseudonym in the format you " +
-            "received it, paste one line at a time." +
+            "received it, paste one line at a time." + " Ignore the blank " +
+            "lines, we will fill them in for you." +
             " Complete the process by typing 'done' on a single line.")
             self.validation_in_progress[nick] = ""
         elif (cmd=="connect"):
@@ -191,6 +192,8 @@ class ORCBot:
         '''
         if(cmd!="done"):
             self.validation_in_progress[nick] += cmd + "\n"
+            if(("Version" in cmd) or ("Hash" in cmd)):
+                self.validation_in_progress[nick] += "\n"
         else:
             pseudonym = self.validation_in_progress.get(nick)
             # Used for debugging, since we now have multilined input we wont bother
