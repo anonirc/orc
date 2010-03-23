@@ -138,8 +138,10 @@ class ORCBot:
             self.enter_pseudonym(nick, cmd, con)
         elif (cmd=="validate"):
             # Add to dictionary, add initialize the pseudonym as a string
-            con.privmsg(nick, "Validation begun, paste your pseudonym now, " + 
-                      "end the process by typing 'done' on a single line.")
+            con.privmsg(nick, "Validation begun, paste your pseudonym now, " +
+            "it is important that you paste the pseudonym in the format you " +
+            "received it, paste one line at a time." +
+            " Complete the process by typing 'done' on a single line.")
             self.validation_in_progress[nick] = ""
         elif (cmd=="connect"):
             #if(self.validated_users.haskey(nick)):
@@ -188,11 +190,12 @@ class ORCBot:
         dictionary and haven't finished their validation.
         '''
         if(cmd!="done"):
-            self.validation_in_progress[nick] += cmd
+            self.validation_in_progress[nick] += cmd + "\n"
         else:
             pseudonym = self.validation_in_progress.get(nick)
-            # Used for debugging
-            con.privmsg(nick, "Your certificate was retrieved, it was " 
+            # Used for debugging, since we now have multilined input we wont bother
+            # to print the pseudonym back to the user for now
+            con.privmsg(nick, "Your certificate was retrieved, trying to validate. " 
                       + pseudonym)
             # TODO: sanitize input?
             validation_result = self.validate_pseudonym(pseudonym, nick, con)
