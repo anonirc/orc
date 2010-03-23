@@ -1,59 +1,65 @@
 #! /usr/bin/env python
+# coding=UTF-8
 
 '''
 Created on 9. mars 2010
 
 @author: Harald Hauknes(harald@hauknes.org)
 
-This is the bot which serves as the communication medium between the proxy
-and the end-user.
-
-This program is reliant on code written by Joel Rosdahl <joel@rosdahl.net>
-of the irclib project http://python-irclib.sourceforge.net/
-Code used includes all references to ircbot or irclib. It is used without 
-the authors permission, but in compliance with the license terms of irclib.
-
-Communicastion to the proxy goes through system calls(proc), 
-communication with the user goes through the IRC protocol
 '''
 # The with statement is not available in Python 2.5, so import it
-#from __future__ import with_statement
+from __future__ import with_statement
 import sys
-#import GnuPGInterface
-#import random
+
+import GnuPGInterface
+import random
+
 
 from ircbot import SingleServerIRCBot
 from irclib import nm_to_n
 
 import banhandler
-
-class ORCBot:
+class ORCBot:  
+    '''
+    This is the bot which serves as the communication medium between the proxy
+    and the end-user.
+    
+    This program is reliant on code written by Joel Rosdahl <joel@rosdahl.net>
+    of the irclib project http://python-irclib.sourceforge.net/
+    Code used includes all references to ircbot or irclib. It is used without 
+    the authors permission, but in compliance with the license terms of irclib.
+    
+    Communication to the proxy goes should go through system calls. 
+    Communication with the user goes through the IRC protocol.
+    '''
     def __init__(self, keyring_loc, key_id):
         '''
         Initializes the OrcBot object.
         Takes arguments keyring_loc, and key id - used by gnupg for the validation process
         '''
-        # The system calls are the bots communication with ORC proxy
-        self.sc = SystemCalls()
-        # This dictonary establishes whether a user is currently undergoing a validation process
-        # Basicly if the user is present in the list, he is in a validation process
+        # The system calls are the bot's communication with ORC proxy
+        self.syscalls = SystemCalls()
+        # This dictonary establishes whether a user is currently undergoing a
+        # validation process. Basicly if the user is present in the list, 
+        # the user is in a validation process.
         self.validation_in_progress = dict()
-        # The GPG validation requires a keyring and a key id, these are the location
-        # in the filesystem
+        # The GPG validation requires a keyring and a key id, 
+        # the two assignments under are the location in the filesystem.
         self.keyring_location = keyring_loc
         self.key_id = key_id
-        # OrcBot needs to know if users are authorized to connect to servers and channels
-        # therefore it contains a banhandler
-        self.banhandler= banhandler.BanHandler()
-        # Starts an instance of SingleServerIRCBot from the irclib project with OrcBot as its parent
+        # OrcBot needs to know if users are authorized to conect to servers 
+        # and channels therefore it contains a banhandler.
+        self.banhandler = banhandler.BanHandler()
+        # Starts an instance of SingleServerIRCBot from the irclib project 
+        # with OrcBot as its parent.
         self.irclibbot = IRCLibBot(self)
-    '''
-    TODO: Make this code work        
-    def validate_pseudonym(self, user_input):
-        #docstringstart
-        #Takes the argument pseudonym and performs validation on the 
-        #pseudonym against the cert.
-        #docstringend                
+    #TODO: Make the validation code work        
+    def validate_pseudonym(self, user_input, nick, con):
+        '''
+        Takes the argument pseudonym and performs validation on the 
+        pseudonym against the cert.
+        '''
+          
         # Define GnuPGInterface
         gnupg = GnuPGInterface.GnuPG()
         
@@ -65,17 +71,16 @@ class ORCBot:
         
         # The ID of the key that was used to sign the user input.
         keyid = self.key_id
-        
         ### End config ###
         
-        """Verify signature of user input using GPG"""
+        ### Verify signature of user input using GPG 
         
         # Write user input to a random file in /tmp, so that the signature
         # can be verified later on. Use small letters, big letters and
         # digits for the filename.
         letters = "abcdefghijklmnopqrstuvwxyz"
         letters += letters.upper () + "0123456789"
-    
+
         # Actually write user input to file
         input_file = "/tmp/"
         for i in range(10):
@@ -89,7 +94,7 @@ class ORCBot:
         # Verify the signature
         clearsign = gnupg.run(['--no-tty'], ['--decrypt'],
         create_fhs=['stdout','stderr'], attach_fhs={'stdin': verify})
-    
+        
         # Read the output from gnupg, and split it into an array so that it
         # can be evaluated.
         signature = clearsign.handles['stderr'].read()
@@ -97,118 +102,169 @@ class ORCBot:
     
         # The signature can not be checked if the public key is not found
         if "public key not found" in signature:
-            print "It seems like the key has not been imported"
+            con.privmsg(nick, "Validation failed, It seems like the key has " + 
+                      "not been imported.")
             return False
     
         # Check if the signature is valid. Do not accept a bad signature.
         if "BAD" in signature:
-            print "Sorry, this signature is not valid"
+            con.privmsg(nick, "Validation failed, Sorry, this signature is " + 
+                      "not valid")
             return False
         
         # Accept a good signature if it is signed by the right key ID. If it
         # is a good signature, and the right key ID have been used, check
         # when the signature was made.
         if "Good" in signature and keyid in s[14]:
-                print "Good signature made", s[4], s[5], s[6], s[7], s[8], s[9]
-                return True
-    '''
-    def user_interaction(self, cmd, c, nick):
+            con.privmsg(nick, "Validation succeded, good signature made") 
+            return True
+            
+        # If none of Runa's if sentences has kicked in, let her know
+        con.privmsg(nick, "Validation reached end of function. " + 
+                  "Something is wrong with the validation.")
+        return False
+
+    def user_interaction(self, cmd, con, nick):
         '''
         This is the hub of user interaction in OrcBot
         Takes command input from the user an calls the corresponding logic
         '''
-        # If the nick is in the dictionary of users currently undergoing validation, we collect 
-        # data till we receive "done" from the user
+        # If the nick is in the dictionary of users currently undergoing 
+        # validation, we collect data till we receive "done" from the user.
         if(self.validation_in_progress.has_key(nick)):  
-            # If it is it means that the nick is currently involved in a validation process. 
-            self.enter_pseudonym(nick, cmd, c)
+            # If True it is it means that the nick is currently involved 
+            # in a validation process. And we should fetch the pseudonym. 
+            self.enter_pseudonym(nick, cmd, con)
         elif (cmd=="validate"):
             # Add to dictionary, add initialize the pseudonym as a string
-            c.privmsg(nick, "Validation begun, paste your pseudonym now, end the process by typing 'done' on a single line.")
+            con.privmsg(nick, "Validation begun, paste your pseudonym now, " +
+            "it is important that you paste the pseudonym in the format you " +
+            "received it, paste one line at a time." + " Ignore the blank " +
+            "lines, we will fill them in for you." +
+            " Complete the process by typing 'done' on a single line.")
             self.validation_in_progress[nick] = ""
         elif (cmd=="connect"):
-            if(self.validated_users.haskey(nick)):
-                #TODO: play with the ServerConnectionDaemon
-                return            
+            #if(self.validated_users.haskey(nick)):
+                #TODO: Figure out how OrcBot gets access to the validated 
+                # users database. Can different threads share an object 
+                # syncronized? This will likely be a system call
+            return            
         elif (cmd=="help"):
-            c.privmsg(nick, "Greetings, this bot support the following commands:")
-            c.privmsg(nick, "help     - This dialog.")
-            c.privmsg(nick, "validate - Validate a pseudonym.")
-            c.privmsg(nick, "connect  - Connect to an irc server. requires validation.")
-            c.privmsg(nick, "join     - Join a channel. requires validation and a active server connection.")
-            c.privmsg(nick, "Type 'help <commandname>' to get more info about each command.")
+            con.privmsg(nick, "Greetings, this bot support the following " + 
+                      "commands:")
+            con.privmsg(nick, "help     - This dialog.")
+            con.privmsg(nick, "validate - Validate a pseudonym.")
+            con.privmsg(nick, "conect  - connect to an irc server. " + 
+                      "requires validation.")
+            con.privmsg(nick, "join     - Join a channel. requires " + 
+                      "validation and a active server connection.")
+            con.privmsg(nick, "Type 'help <commandname>' to get more info" + 
+                      "about each command.")
             
         elif (cmd=="help validate"):
-            c.privmsg(nick, "Validates a pseudonym, it makes the bot temporarily accept any data you send it for validation.")
-            c.privmsg(nick, "The process is concluded by typing 'done'. on a single line.")
+            con.privmsg(nick, "Validates a pseudonym, it makes orcbot " + 
+                      "temporarily accept any data you send it for validation.")
+            con.privmsg(nick, "The process is concluded by typing 'done'. " + 
+                      "on a single line.")
             #TODO: Finish this method stub.
         elif (cmd=="help connect"):
-            c.privmsg(nick, "Connects øyou to an irc server of your choice.")
-            c.privmsg(nick, "The command may take one or two arguments, servername and port")
-            c.privmsg(nick, "If no port is defined, the command will try connecting on the standard port.")
+            con.privmsg(nick, "Connects you to an IRC server of your choice.")
+            con.privmsg(nick, "The command may take one or two arguments, "
+                      + "servername and port")
+            con.privmsg(nick, "If no port is defined, the command will try " + 
+                      "connecting on the standard port.")
             #TODO: Finish this method stub.
         elif (cmd=="die"):
             #TODO: Remove this, its a debugging method
             print "Terminating by user request.."
-            c.privmsg(nick, "Bye now..")
+            con.privmsg(nick, "Bye now..")
             sys.exit(0)
             
         else:
-            c.notice(nick, "You wrote: '" + cmd + "' this is not a recognized command, try typing 'help'")
+            con.notice(nick, "You wrote: '" + cmd + "' this is not a " + 
+                     "recognized command, try typing 'help'")
         
-    def enter_pseudonym(self,nick,cmd,c):
+    def enter_pseudonym(self, nick, cmd, con):
+        '''
+        This function is called as long as the user is in the validation 
+        dictionary and haven't finished their validation.
+        '''
         if(cmd!="done"):
-            self.validation_in_progress[nick] += cmd
+            self.validation_in_progress[nick] += cmd + "\n"
+            if(("Version" in cmd) or ("Hash" in cmd)):
+                self.validation_in_progress[nick] += "\n"
         else:
             pseudonym = self.validation_in_progress.get(nick)
-            # Used for debugging
-            c.privmsg(nick, "Your certificate was retrieved, it was " + pseudonym)
+            # Used for debugging, since we now have multilined input we wont bother
+            # to print the pseudonym back to the user for now
+            con.privmsg(nick, "Your certificate was retrieved, trying to validate. " 
+                      + pseudonym)
             # TODO: sanitize input?
-            # Validation_result = self.validate_pseudonym(pseudonym)
-            validation_result = True
+            validation_result = self.validate_pseudonym(pseudonym, nick, con)
             # Remove nick from the validation process list
             del self.validation_in_progress[nick]
             if(validation_result):
-                c.privmsg(nick, "Validation performed succesfully, you may now connect.")
-                c.privmsg(nick, "For instructions type 'help connect'")
+                con.privmsg(nick, "Validation performed successfully, " + 
+                          "you may now connect.")
+                con.privmsg(nick, "For instructions type 'help connect'")
                 # self.validated_users.add(connection, pseudonym)
-                # TODO figure out how the connection or nick should be stored
+                #TODO: Figure out how the connection or nick should be stored
             else:
-                c.privmsg(nick, "Validation failed, check that you are using a valid pseudonym.")
+                con.privmsg(nick, "Validation failed, check that you are " + 
+                          "using a valid pseudonym.")
             
             
 class SystemCalls:
-    #TODO: Figure out how to do unix system calls to running processes
+    '''
+    TODO: Figure out how to do unix system calls to running processes.
+    '''
+    def __init__(self):
+        return
+    
     def add_validated_user(self):
+        '''
+        Will add a validated user to the database running on the proxy.
+        '''
+        return
+    
+    def connect(self):
+        # def connect(self, pseudonym, server):
+        '''
+        Tells the proxy to connect a user to a server. 
+        '''
         return
             
 class IRCLibBot(SingleServerIRCBot):
-    def __init__(self, parent, channel="#it2901-tp", nickname="orcbot", server="localhost", port=6667):
+    '''
+    IRCLibBot from the irclib library.
+    '''
+    def __init__(self, parent, nickname ="orcbot", server ="localhost", 
+                 port=6667):
         self.orc = parent
-        #TODO: Remove this, its for debug only, OrcBot will run on localhost of the proxy
-        server="irc.oftc.net"
+        #TODO: Remove next line, its for debug only, OrcBot will run on 
+        # localhost of the proxy
+        server = "irc.oftc.net"
         SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
-        #TODO: Remove this, its for debug only, OrcBot will never join a channel
-        self.channel = channel
+
         print "Bot started.."
         self.start()
 
     #TODO: Add DCC support 
-    def on_privmsg(self, c, e):
+    def on_privmsg(self, con, eee):
         '''
         Define what to do when someone sends a message to the bot
         '''
         # We have written our own user interaction code: user_interaction,
         # from here OrcBot code takes over SingleServerIRCBot
-        self.orc.user_interaction(e.arguments()[0], c, nm_to_n(e.source()))
-        # self.orc.user_interaction(cmd, c, nick)
-        
-    def on_welcome(self, c, e):
-        #TODO: Remove this, its for debug only, OrcBot will never join a channel
-        c.join(self.channel)
+        self.orc.user_interaction(eee.arguments()[0], con, 
+                                  nm_to_n(eee.source()))
+        # self.orc.user_interaction(cmd, con, nick)
                 
 def main():
-    #TODO: Make this happen from config file
+    '''
+    If OrcBot is not called from a init script externally, fill it with
+    dummy values.
+    '''
     ORCBot("HERE GOES THE LOCATION OF THE KEYRING", "HERE GOES KEYID")
 
 if __name__ == "__main__":
