@@ -116,8 +116,7 @@ class ORCBot:
         # is a good signature, and the right key ID have been used, check
         # when the signature was made.
         if "Good" in signature and keyid in s[14]:
-            con.privmsg(nick, "Validation succeded, good signature made", 
-                      s[4], s[5], s[6], s[7], s[8], s[9])
+            con.privmsg(nick, "Validation succeded, good signature made") 
             return True
             
         # If none of Runa's if sentences has kicked in, let her know
