@@ -1,6 +1,7 @@
 import threading
 import thread
 import socket
+import Event
 
 import ircParse as parse
 

@@ -26,5 +26,5 @@ def runDumbSender(message, host, port):
 
 for i in range(5):
     time.sleep(1)
-    thread.start_new_thread(runDumbSender, ("I'm number %d"%(i), HOST, PORT))
+    thread.start_new_thread(runDumbSender, (":guntbert!~re@unaffiliated/guntbert PRIVMSG #ubuntu :enthus: like histo just said: carry the app and all its dependencies", HOST, PORT ))
 

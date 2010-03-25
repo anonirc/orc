@@ -59,8 +59,10 @@ class Event:
         """
         
     def privmsg(self):
-        """TODO
         """
+        """
+        for i in self.data:
+            print i
         
     def privnotice(self):
         """TODO
