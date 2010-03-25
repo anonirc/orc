@@ -1,22 +1,25 @@
+""" Defines the incomingConnectionDaemon class
+"""
 import threading
 import thread
 import socket
-import Event
 
 import ircParse as parse
 
-connections=[]
+connections = []
 
 class IncomingConnectionDaemon(threading.Thread):
-    
+    """ Class for receiving incoming connections and handle
+    incoming traffic
+    """
     def init(self, host, port):
         """Threading.Thread does not like having it's __init__
         overridden, thus the necessity for a different init method
         """
-        self.host=host
-        self.port=port
-        self.backlog=10
-        self.size=1024
+        self.host = host
+        self.port = port
+        self.backlog = 10
+        self.size = 1024
         threading.Thread.__init__(self)
     
     def run(self):
@@ -28,26 +31,26 @@ class IncomingConnectionDaemon(threading.Thread):
         print self.port
         print "-----------------------"
         #Instantiates a socket object and binds it to a port.
-        S = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        S.bind((self.host,self.port))
-        S.listen(self.backlog)
+        SOCK = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        SOCK.bind((self.host,self.port))
+        SOCK.listen(self.backlog)
         #An array to keep incoming connection
         spawn_look_for_events(self.host, connections)
         #Accepts new connections
         while 1:
-            connections.append(S.accept())
+            connections.append(SOCK.accept())
             print "connected"
 
-def spawn_look_for_events(host, connections):
+def spawn_look_for_events(lhost, lconnections):
     """Starts the look_for_events function in  new thread
     and passes connections to it
     """
     try:
-        thread.start_new_thread(look_for_events, (host, connections, ))
-    except:
+        thread.start_new_thread(look_for_events, (lhost, lconnections, ))
+    except :
         print "Error: unable to start thread"
         
-def look_for_events(host, connections):
+def look_for_events(host, lconnections):
     """
     Looks for new data in all connections
     Arguments: host, connections
@@ -55,9 +58,9 @@ def look_for_events(host, connections):
     while 1:
         #goes through connections and calls ircParse's process_data
         #on them, returning an Event object, or None
-        events=map(lambda x:parse.process_data(x), connections)
+        events = map(lambda x:parse.process_data(x), lconnections)
         #filters out the None's, in other words the ones without new data
-        events=filter(lambda x:x!=None, events)
-        for e in events:
-            e.printC()
+        events = filter(lambda x:x!=None, events)
+        for ev in events:
+            ev.apply_handler()
         

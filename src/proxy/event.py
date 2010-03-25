@@ -1,38 +1,46 @@
+""" Defines the Event class
+"""
 class Event:
     """Holds the type and handler function for irc events
     """
 
-    def __init__(self, type, source, target, data=[]):
+    def __init__(self, event_type, source, target, data=None):
         """Holds an event with event type, source, target,
         and optionally data needed for the event
         """
-        self.type=type
-        self.source=source
-        self.target=target
-        self.data=data
-        self.socket=source
+        self.event_type = event_type
+        self.source = source
+        self.target = target
+        self.data = data
+        self.socket = source
 
     def apply_handler(self):
-        #the code that calls the event handler for the event
-        #type
-        m = self.type
-        if hasattr(self, m):
-            getattr(self, m)()
+        """the code that calls the event handler for the event
+        type
+        """
+        tmp = self.event_type
+        if hasattr(self, tmp):
+            getattr(self, tmp)()
 
     def get_type(self):
-        return self.type
+        """ Gets the type of an event"""
+        return self.event_type
    
     def get_source(self):
+        """ Gets the source of an event"""
         return self.source
    
     def get_target(self):
+        """Gets the target"""
         return self.target
    
     def get_data(self):
+        """Gets the data"""
         return self.data
    
     def printC(self):
-        print(self.type)
+        """print function, used for debugging/testing"""
+        print(self.event_type)
 
     def error(self):
         """TODO:
@@ -58,10 +66,10 @@ class Event:
         """
         
     def privmsg(self):
-        """
+        """ Handles privmsg event
         """
         print 
-        print self.type
+        print self.event_type
         print self.source
         print self.target
         for i in self.data:

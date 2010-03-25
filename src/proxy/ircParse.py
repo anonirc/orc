@@ -1,10 +1,12 @@
-#Copies a lot from IRClib, adapted to be usable for making a bouncer
+"""Copies a lot from IRClib, adapted to be usable for making a bouncer
+"""
 import re
 import socket
-import Event
+import event
 
 #Regex that groups the different parts of a IRC message.
-_rfc_1459_command_regexp = re.compile("^(:(?P<prefix>[^ ]+) +)?(?P<command>[^ ]+)( *(?P<argument> .+))?")
+_rfc_1459_command_regexp = re.compile(
+    "^(:(?P<prefix>[^ ]+) +)?(?P<command>[^ ]+)( *(?P<argument> .+))?")
 
 
 #splits lines. RFC standard is \r\n, but a
@@ -16,13 +18,13 @@ def process_data(connection):
     the socket, and returns an Event of it
     """
     try:
-        new_data=connection[0].recv(2**14)
+        new_data = connection[0].recv(2**14)
         if(new_data):
             print("\ndata: %s " %(new_data))
-    except socket.error, x:
-        """Connection reset by peer
-        """
+    except socket.error, err:
+        #Connection reset by peer
         print("Socket errror")
+        print err
         #TODO: return a connectionClosed event
         return None
     
@@ -42,20 +44,20 @@ def process_data(connection):
         if not line:
             continue
 
-        m = _rfc_1459_command_regexp.match(line)
+        msg = _rfc_1459_command_regexp.match(line)
         
-        if m.group("prefix"):
-            prefix = m.group("prefix")
+        if msg.group("prefix"):
+            prefix = msg.group("prefix")
           
-        if m.group("command"):
-            command = m.group("command").lower()
+        if msg.group("command"):
+            command = msg.group("command").lower()
 
-        if m.group("argument"):
-            a = m.group("argument").split(" :", 1)
-            print a
-            arguments = a[0].split()
-            if len(a) == 2:
-                arguments.append(a[1])
+        if msg.group("argument"):
+            arg = msg.group("argument").split(" :", 1)
+            print arg
+            arguments = arg[0].split()
+            if len(arg) == 2:
+                arguments.append(arg[1])
 
         # Translate numerics into more readable strings.
         if command in numeric_events:
@@ -63,7 +65,8 @@ def process_data(connection):
             
     print("prefix %s, Target: %s\n"%(prefix, connection[1][0]))
     
-    e = Event(command, connection[0], connection[1], arguments)
+    e = event.Event(command, connection[0], connection[1], arguments)
+    
     return e
 
 
@@ -75,7 +78,7 @@ numeric_events = {
     "002": "yourhost",
     "003": "created",
     "004": "myinfo",
-    "005": "featurelist",  # XXX
+    "005": "featurelist",  # XX
     "200": "tracelink",
     "201": "traceconnecting",
     "202": "tracehandshake",
