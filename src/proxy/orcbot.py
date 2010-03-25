@@ -185,31 +185,31 @@ class ORCBot:
                     con.privmsg(nick, "ERROR: You are banned from " +
                     "this server.")
                 else:
-                    self.scd.connect_to_server(nick, con, server)
+                    #TODO: Activate method once SCD runs
+                    #self.scd.connect_to_server(nick, con, server)
                     #TODO: Find out how to extract socket object from
-                    # irclib's bot. Test towards SCD when it's running. 
+                    # irclib's bot. Test towards SCD when it's running.
+                    con.destroy()
 
             elif(len(pieces[2]) > 1):
                 server =  pieces[1] # Server
                 port =  pieces[2]
                 if(re.match("[0-9]+", port)):
-                    #TODO: Check that the port is actually a number
-                    #self.scd.connect_user_to_server
                     serverban = self.banhandler.is_banned_from_server(
                     self.validated_users.get(nick), server)
                     if (serverban):
                         con.privmsg(nick, "ERROR: You are banned from " +
                         "this server.")
                     else:
-                        self.scd.connect_to_server(nick, con, server)
-                    #TODO: Find out how to extract socket object from
-                    # irclib's bot. Test towards SCD when it's running.
-                    con.privmsg(nick, "Connecting you to " + server + 
-                    " at port " + port +  ". In a moment you will" + 
-                    "be able to join a channel, type 'help join' for " +
-                    "instructions.")
+                        #TODO: Find out how to extract socket object from
+                        # irclib's bot. Test towards SCD when it's running.
+                        con.privmsg(nick, "Connecting you to " + server + 
+                        " at port " + port +  ". In a moment you will" + 
+                        "be able to join a channel, type 'help join' for " +
+                        "instructions.")
+                        #TODO: Activate method once SCD runs
+                        #self.scd.connect_to_server(nick, con, server)
                 else:
-
                     con.privmsg(nick, "Port cannot contain anything " +
                     "but numbers. Try again. For help type 'help connect'")
                     return
