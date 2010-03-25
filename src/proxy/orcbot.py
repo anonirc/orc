@@ -156,22 +156,49 @@ class ORCBot:
             self.validation_in_progress[nick] = ""
 
         elif ("connect" in cmd):
+            # TODO: Activate this method once test enviroment is running
+            # For now, validation checking is diabled
+
+            #if(not self.validated_users.haskey(nick):
+            #    con.privmsg(nick, "You are not validated and may not " +
+            #    "connect. Type 'help validate' for instructions."
+            #    return
+
             # This regexp returns a string array of word, which it parses by
             # seperating them by whitespace.
             pieces = [p for p in re.split("( |\\\".*?\\\"|'.*?')", cmd) if
             p.strip()]
-            server =  pieces[1] # Server
-            port = int(pieces[2]) # Port, if specified
-            if(len(pieces[2]) < 2 and port > 1):
+            # Set the default port in case the user does not specify one
+            port = 6667
+            if(len(pieces) < 2):
+                con.privmsg(nick, "You supplied too few arguments (atleast"
+                + " one needed), type 'help connect' for more info.")
+            elif(len(pieces) < 3):
+                server =  pieces[1] # Server
+                con.privmsg(nick, "You specified no port, defaulting to " + 
+                str(port) +
+                ". In moments you will be able to join a channel." +
+                " Type 'help join' for more information.")
+                serverban = self.banhandler.is_banned_from_server(
+                self.validated_users.get(nick), server)
+                if (serverban):
+                     con.privmsg(nick, "ERROR: You are banned from " +
+                     "this server")
+                else:
+                    self.scd.connect_to_server(nick, con, server)
+
+            elif(len(pieces[2]) > 1):
+                server =  pieces[1] # Server
+                port =  pieces[2]
+                #TODO: Check that the prot is actually a number
                 #self.scd.connect_user_to_server
                 con.privmsg(nick, "Connecting you to " + server + 
-                ", defaulting to standard port 6667. Within moments you will " 
-                + "be able to join a channel, type 'help join' for " +
-                "instructions")
-                #TODO: Deal with nullpointer objects 
+                " at port " + port +  ". In a  moment you will" + 
+                "be able to join a channel, type 'help join' for " +
+                "instructions.")
             else:
-                print "connecting with port"
-                #self.scd
+                con.privmsg(nick, "Something went wrong, please " +
+                "contact the system administrator.")
 
                 #if(self.validated_users.haskey(nick)):
                 #TODO: Write calls to the scd object
