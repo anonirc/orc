@@ -15,7 +15,7 @@ class Event:
     def apply_handler(self):
         #the code that calls the event handler for the event
         #type
-        m = self.type()
+        m = self.type
         if hasattr(self, m):
             getattr(self, m)()
 
@@ -60,6 +60,10 @@ class Event:
     def privmsg(self):
         """
         """
+        print 
+        print self.type
+        print self.source
+        print self.target
         for i in self.data:
             print i
         
