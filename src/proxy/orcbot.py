@@ -125,7 +125,7 @@ class ORCBot:
         # is a good signature, and the right key ID have been used, check
         # when the signature was made.
         if "Good" in signature and keyid in s[14]:
-            con.privmsg(nick, "Validation succeded, good signature made") 
+            con.privmsg(nick, "Validation succeded, good signature made.") 
             return True
             
         # If no if sentences has kicked in, system is broken
@@ -182,33 +182,47 @@ class ORCBot:
                 serverban = self.banhandler.is_banned_from_server(
                 self.validated_users.get(nick), server)
                 if (serverban):
-                     con.privmsg(nick, "ERROR: You are banned from " +
-                     "this server")
+                    con.privmsg(nick, "ERROR: You are banned from " +
+                    "this server.")
                 else:
-                    self.scd.connect_to_server(nick, con, server)
+                    #TODO: Activate method once SCD runs
+                    #self.scd.connect_to_server(nick, con, server)
+                    #TODO: Find out how to extract socket object from
+                    # irclib's bot. Test towards SCD when it's running.
+                    con.destroy()
 
             elif(len(pieces[2]) > 1):
                 server =  pieces[1] # Server
                 port =  pieces[2]
-                #TODO: Check that the prot is actually a number
-                #self.scd.connect_user_to_server
-                con.privmsg(nick, "Connecting you to " + server + 
-                " at port " + port +  ". In a  moment you will" + 
-                "be able to join a channel, type 'help join' for " +
-                "instructions.")
+                if(re.match("[0-9]+", port)):
+                    serverban = self.banhandler.is_banned_from_server(
+                    self.validated_users.get(nick), server)
+                    if (serverban):
+                        con.privmsg(nick, "ERROR: You are banned from " +
+                        "this server.")
+                    else:
+                        #TODO: Find out how to extract socket object from
+                        # irclib's bot. Test towards SCD when it's running.
+                        con.privmsg(nick, "Connecting you to " + server + 
+                        " at port " + port +  ". In a moment you will" + 
+                        "be able to join a channel, type 'help join' for " +
+                        "instructions.")
+                        #TODO: Activate method once SCD runs
+                        #self.scd.connect_to_server(nick, con, server)
+                else:
+                    con.privmsg(nick, "Port cannot contain anything " +
+                    "but numbers. Try again. For help type 'help connect'")
+                    return
             else:
                 con.privmsg(nick, "Something went wrong, please " +
                 "contact the system administrator.")
-
-                #if(self.validated_users.haskey(nick)):
-                #TODO: Write calls to the scd object
 
         elif (cmd=="help"):
             con.privmsg(nick, "Greetings, this bot support the following " + 
                       "commands:")
             con.privmsg(nick, "help     - This dialog.")
             con.privmsg(nick, "validate - Validate a pseudonym.")
-            con.privmsg(nick, "conect  - connect to an irc server. " + 
+            con.privmsg(nick, "connect  - Connect to an IRC server. " + 
                       "requires validation.")
             con.privmsg(nick, "join     - Join a channel. requires " + 
                       "validation and a active server connection.")
@@ -220,14 +234,14 @@ class ORCBot:
                       "temporarily accept any data you send it for validation.")
             con.privmsg(nick, "The process is concluded by typing 'done'. " + 
                       "on a single line.")
-            #TODO: Finish this method stub.
+            con.privmsg(nick, "You can obtain a pseudonym at http...")
+             #TODO: Finish this method stub, tell the user where the PM is
         elif (cmd=="help connect"):
             con.privmsg(nick, "Connects you to an IRC server of your choice.")
             con.privmsg(nick, "The command may take one or two arguments, "
-                      + "servername and port")
-            con.privmsg(nick, "If no port is defined, the command will try " + 
-                      "connecting on the standard port.")
-            #TODO: Finish this method stub.
+                      + "servername and port. If no port is defined, the " + 
+                      "standard port is selected by default.")
+            con.privmsg(nick, "Example: 'connect irc.oftc.net 6667'")
 
         elif (cmd=="die"):
             #TODO: Remove this, its a debugging method
@@ -267,13 +281,6 @@ class ORCBot:
                           "using a valid pseudonym. Type 'help validate' " +
                           "for more information." )
     
-    def connect(self):
-        # def connect(self, pseudonym, server):
-        '''
-        Tells the proxy to connect a user to a server. 
-        '''
-        return
-            
 class IRCLibBot(SingleServerIRCBot):
     '''
     IRCLibBot from the irclib library.
