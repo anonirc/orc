@@ -32,7 +32,7 @@ class ServerConnectionDaemon(threading.Thread):
             for e in events:
                 e.printC()
 
-    def connect_to_server(nick="", connection, server_address, password=None, port=6667):
+    def connect_to_server(nick, connection, server_address, password=None, port=6667):
         """
         Arguments:
         - nick:
