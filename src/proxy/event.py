@@ -1,4 +1,3 @@
-
 class Event:
     """Holds the type and handler function for irc events
     """
@@ -59,8 +58,10 @@ class Event:
         """
         
     def privmsg(self):
-        """TODO
         """
+        """
+        for i in self.data:
+            print i
         
     def privnotice(self):
         """TODO
