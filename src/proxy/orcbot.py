@@ -13,12 +13,14 @@ import sys
 
 import GnuPGInterface
 import random
+import re
 
 
 from ircbot import SingleServerIRCBot
 from irclib import nm_to_n
 
 import banhandler
+
 class ORCBot:  
     '''
     This is the bot which serves as the communication medium between the proxy
@@ -32,13 +34,14 @@ class ORCBot:
     Communication to the proxy goes should go through system calls. 
     Communication with the user goes through the IRC protocol.
     '''
-    def __init__(self, keyring_loc, key_id):
+    def __init__(self, keyring_loc, key_id, ban_db, scd):
         '''
         Initializes the OrcBot object.
-        Takes arguments keyring_loc, and key id - used by gnupg for the validation process
+        Takes arguments: 
+        - keyring_loc, and key id - used by gnupg for the validation process
+        - ban_db - an instance of the banhandler, share by the other classes
+        - scd - the instance of the ServerConnectionDaemon 
         '''
-        # The system calls are the bot's communication with ORC proxy
-        self.syscalls = SystemCalls()
         # This dictonary establishes whether a user is currently undergoing a
         # validation process. Basicly if the user is present in the list, 
         # the user is in a validation process.
@@ -47,13 +50,18 @@ class ORCBot:
         # the two assignments under are the location in the filesystem.
         self.keyring_location = keyring_loc
         self.key_id = key_id
-        # OrcBot needs to know if users are authorized to conect to servers 
+        # We need to be able ask the ServerConnectionDaemon for connects
+        self.scd = scd
+        # We keep a list of users that have validated themselves
+        self.validated_users = dict()
+        # TODO: Figure out how to and what to store in that dict
+        # OrcBot needs to know if users are authorized to connect to servers 
         # and channels therefore it contains a banhandler.
         self.banhandler = banhandler.BanHandler()
         # Starts an instance of SingleServerIRCBot from the irclib project 
         # with OrcBot as its parent.
         self.irclibbot = IRCLibBot(self)
-    #TODO: Make the validation code work        
+    
     def validate_pseudonym(self, user_input, nick, con):
         '''
         Takes the argument pseudonym and performs validation on the 
@@ -82,6 +90,7 @@ class ORCBot:
         letters += letters.upper () + "0123456789"
 
         # Actually write user input to file
+        #TODO: Write files sequentially, and delete them afterwards
         input_file = "/tmp/"
         for i in range(10):
             input_file += random.choice(letters)
@@ -119,9 +128,10 @@ class ORCBot:
             con.privmsg(nick, "Validation succeded, good signature made") 
             return True
             
-        # If none of Runa's if sentences has kicked in, let her know
+        # If no if sentences has kicked in, system is broken
         con.privmsg(nick, "Validation reached end of function. " + 
-                  "Something is wrong with the validation.")
+                  "Something is wrong with the validation. Please contact "
+                  + " the server administrator.")
         return False
 
     def user_interaction(self, cmd, con, nick):
@@ -135,6 +145,7 @@ class ORCBot:
             # If True it is it means that the nick is currently involved 
             # in a validation process. And we should fetch the pseudonym. 
             self.enter_pseudonym(nick, cmd, con)
+
         elif (cmd=="validate"):
             # Add to dictionary, add initialize the pseudonym as a string
             con.privmsg(nick, "Validation begun, paste your pseudonym now, " +
@@ -143,12 +154,28 @@ class ORCBot:
             "lines, we will fill them in for you." +
             " Complete the process by typing 'done' on a single line.")
             self.validation_in_progress[nick] = ""
-        elif (cmd=="connect"):
-            #if(self.validated_users.haskey(nick)):
-                #TODO: Figure out how OrcBot gets access to the validated 
-                # users database. Can different threads share an object 
-                # syncronized? This will likely be a system call
-            return            
+
+        elif ("connect" in cmd):
+            # This regexp returns a string array of word, which it parses by
+            # seperating them by whitespace.
+            pieces = [p for p in re.split("( |\\\".*?\\\"|'.*?')", cmd) if
+            p.strip()]
+            server =  pieces[1] # Server
+            port = int(pieces[2]) # Port, if specified
+            if(len(pieces[2]) < 2 and port > 1):
+                #self.scd.connect_user_to_server
+                con.privmsg(nick, "Connecting you to " + server + 
+                ", defaulting to standard port 6667. Within moments you will " 
+                + "be able to join a channel, type 'help join' for " +
+                "instructions")
+                #TODO: Deal with nullpointer objects 
+            else:
+                print "connecting with port"
+                #self.scd
+
+                #if(self.validated_users.haskey(nick)):
+                #TODO: Write calls to the scd object
+
         elif (cmd=="help"):
             con.privmsg(nick, "Greetings, this bot support the following " + 
                       "commands:")
@@ -174,6 +201,7 @@ class ORCBot:
             con.privmsg(nick, "If no port is defined, the command will try " + 
                       "connecting on the standard port.")
             #TODO: Finish this method stub.
+
         elif (cmd=="die"):
             #TODO: Remove this, its a debugging method
             print "Terminating by user request.."
@@ -195,11 +223,9 @@ class ORCBot:
                 self.validation_in_progress[nick] += "\n"
         else:
             pseudonym = self.validation_in_progress.get(nick)
-            # Used for debugging, since we now have multilined input we wont bother
-            # to print the pseudonym back to the user for now
-            con.privmsg(nick, "Your certificate was retrieved, trying to validate. " 
-                      + pseudonym)
-            # TODO: sanitize input?
+            # Used for debugging, since we now have multilined input we wont 
+            # bother to print the pseudonym back to the user for now.
+            con.privmsg(nick, "Your certificate was retrieved, validating..")
             validation_result = self.validate_pseudonym(pseudonym, nick, con)
             # Remove nick from the validation process list
             del self.validation_in_progress[nick]
@@ -211,21 +237,8 @@ class ORCBot:
                 #TODO: Figure out how the connection or nick should be stored
             else:
                 con.privmsg(nick, "Validation failed, check that you are " + 
-                          "using a valid pseudonym.")
-            
-            
-class SystemCalls:
-    '''
-    TODO: Figure out how to do unix system calls to running processes.
-    '''
-    def __init__(self):
-        return
-    
-    def add_validated_user(self):
-        '''
-        Will add a validated user to the database running on the proxy.
-        '''
-        return
+                          "using a valid pseudonym. Type 'help validate' " +
+                          "for more information." )
     
     def connect(self):
         # def connect(self, pseudonym, server):
@@ -265,7 +278,8 @@ def main():
     If OrcBot is not called from a init script externally, fill it with
     dummy values.
     '''
-    ORCBot("HERE GOES THE LOCATION OF THE KEYRING", "HERE GOES KEYID")
+    ORCBot("HERE GOES THE LOCATION OF THE KEYRING", "HERE GOES KEYID",
+    "Placeholder", "Placeholder")
 
 if __name__ == "__main__":
     main()
