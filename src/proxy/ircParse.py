@@ -18,7 +18,7 @@ def process_data(connection):
     the socket, and returns an Event of it
     """
     try:
-        new_data = connection[0].recv(2**14)
+        new_data = connection[0][0].recv(2**14)
         if(new_data):
             print("\ndata: %s " %(new_data))
     except socket.error, err:
@@ -63,10 +63,10 @@ def process_data(connection):
         if command in numeric_events:
             command = numeric_events[command]
             
-    print("prefix %s, Target: %s\n"%(prefix, connection[1][0]))
+#    print("prefix %s, Target: %s\n"%(prefix, connection[1][0]))
     
     e = event.Event(command, connection[0], connection[1], arguments)
-    
+
     return e
 
 

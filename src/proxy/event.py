@@ -1,3 +1,6 @@
+import string
+import serverConnectionDaemon as server
+import incomingConnections as incoming
 """ Defines the Event class
 """
 class Event:
@@ -70,11 +73,20 @@ class Event:
         """
         print 
         print self.event_type
+        print "****Source**"
         print self.source
+        print "*******target**"
         print self.target
-        for i in self.data:
-            print i
-        
+        print self.data[0]
+        #if(self.data[0]==":orcbot"):
+        message = string.split(self.data[0], ":")
+        if(message[0]=="orcbot"):
+            #TODO input validation
+            incoming.add_target(self.source,
+                                server.connect_to_server(
+                                    "insert nick here",
+                                    self.source,
+                                    message[2]))
     def privnotice(self):
         """TODO
         """
