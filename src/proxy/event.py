@@ -77,16 +77,17 @@ class Event:
         print self.source
         print "*******target**"
         print self.target
+        print "*****data***"
+    
         print self.data[0]
-        #if(self.data[0]==":orcbot"):
-        message = string.split(self.data[0], ":")
-        if(message[0]=="orcbot"):
+        if(self.data[0]=="#orcbot"):
+            message = string.split(self.data[1], ":")
             #TODO input validation
             incoming.add_target(self.source,
                                 server.connect_to_server(
                                     "insert nick here",
                                     self.source,
-                                    message[2]))
+                                    message[1]))
     def privnotice(self):
         """TODO
         """

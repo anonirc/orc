@@ -19,8 +19,6 @@ def process_data(connection):
     """
     try:
         new_data = connection[0][0].recv(2**14)
-        if(new_data):
-            print("\ndata: %s " %(new_data))
     except socket.error, err:
         #Connection reset by peer
         print("Socket errror")
@@ -29,7 +27,7 @@ def process_data(connection):
         return None
     
     if not new_data:
-        print("nothing new")
+        #print("nothing new")
         # Read nothing: connection must be down.
         return None
     
