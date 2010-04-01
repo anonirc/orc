@@ -50,7 +50,7 @@ def spawn_look_for_events(lhost, lconnections):
     try:
         thread.start_new_thread(look_for_events, (lhost, lconnections, ))
     except :
-        print "Erro: unable to start thread"
+        print "Error: unable to start thread"
         
 def look_for_events(host, lconnections):
     """
@@ -58,13 +58,14 @@ def look_for_events(host, lconnections):
     Arguments: host, connectxions
     """
     while 1:
-        #goes through connections and calls ircParse's process_data
-        #on them, returning an Event object, or None
-        events = map(lambda x:parse.process_data(x), lconnections.items())
-        #filters out the None's, in other words the ones without new data
-        events = filter(lambda x:x!=None, events)
-        for ev in events:
-            ev.apply_handler()
+        if(lconnections):
+            #goes through connections and calls ircParse's process_data
+            #on them, returning an Event object, or None
+            events = map(lambda x:parse.process_data(x), lconnections.items())
+            #filters out the None's, in other words the ones without new data
+            events = filter(lambda x:x!=None, events)
+            for ev in events:
+                ev.apply_handler()
         
 def add_target(connection, target):
     connections[connection]=target
