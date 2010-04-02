@@ -1,5 +1,5 @@
 '''
-Created on 22. mars 2010
+Created on 22. March 2010
 
 @author: Harald Hauknes
 
