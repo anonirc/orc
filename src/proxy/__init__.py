@@ -9,7 +9,13 @@ All global variables will be configured from here.
 '''
 import os
 
+# TODO: Possibly remove the socket import
+import socket
 import orcbot
+import banhandler as banhandler
+import incomingConnections as incoming
+import serverConnectionDaemon as outgoing
+
 # Check what user has initiated the script
 process = os.popen("whoami")
 output = process.read()
@@ -29,12 +35,30 @@ if(testuser):
 # testing purposes and the resources the script requires reside on the
 # user's home directory
 
+# TODO: decide whether this should be in a config file
+# TODO: Probably won't need the socket import here, as the gethostname
+# will be removed
+#settings for accepting connections
+HOST=socket.gethostname()
+PORT=31337
+
 #TODO: Get a working proxy implementation up
 #TODO: Add keyid to this ORCBot
 #TODO: Fork threads if neccesary
 #TODO:
-bot = orcbot.ORCBot("~/.gnupg", "KEYID?")
 
+#should set up sender and receiver threads
+print "starting receiver"
+receiver = incoming.IncomingConnectionDaemon()
+receiver.init(HOST, PORT)
+receiver.start()
 
+print "starting sender"
+sender = outgoing.serverConnectionDaemon()
+sender.start()
 
+print "starting banhandler"
+bh = banhandler.BanHandler()
 
+print "starting bot"
+bot = orcbot.ORCBot("~/.gnupg", "KEYID?", bh , sender)
