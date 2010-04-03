@@ -9,6 +9,7 @@ import ircParse as parse
 #connections[] holds a tuple containing the socket object of a connection,
 #and the socket object of the server it's connected to
 connections = {}
+orcbot = None
 
 class IncomingConnectionDaemon(threading.Thread):
     """ Class for receiving incoming connections and handle
@@ -36,13 +37,18 @@ class IncomingConnectionDaemon(threading.Thread):
         SOCK = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         SOCK.bind((self.host,self.port))
         SOCK.listen(self.backlog)
-        #An array to keep incoming connection
+        #starts the method that looks for events in connections
         spawn_look_for_events(self.host, connections)
-        #Accepts new connections
+        #first connection should be from orcbot
+        orcbot = SOCK.accept()
+        print "OrcBot connected"
         while 1:
             connections[SOCK.accept()]= None
             print("connected")
 
+def get_orcbot():
+    return orcbot
+            
 def spawn_look_for_events(lhost, lconnections):
     """Starts the look_for_events function in  new thread
     and passes connections to it
@@ -59,6 +65,7 @@ def look_for_events(host, lconnections):
     """
     while 1:
         if(lconnections):
+            print "loopin'"
             #goes through connections and calls ircParse's process_data
             #on them, returning an Event object, or None
             events = map(lambda x:parse.process_data(x), lconnections.items())
