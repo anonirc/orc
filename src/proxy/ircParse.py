@@ -64,7 +64,7 @@ def process_data(connection):
             
 #    print("prefix %s, Target: %s\n"%(prefix, connection[1][0]))
     print "makin' event"
-    e = event.Event(command, connection[0], connection[1], arguments)
+    e = event.Event(command, connection[0], connection[1],None,  arguments)
 
     return e
 
