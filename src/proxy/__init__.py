@@ -34,13 +34,13 @@ if(testuser):
 # If another user then root or www-data is running, we assume it's for
 # testing purposes and the resources the script requires reside on the
 # user's home directory
-
+#
 # TODO: decide whether this should be in a config file
 # TODO: Probably won't need the socket import here, as the gethostname
 # will be removed
 #settings for accepting connections
-HOST=socket.gethostname()
-PORT=31337
+HOST = socket.gethostname()
+PORT = 31337
 
 #TODO: Get a working proxy implementation up
 #TODO: Add keyid to this ORCBot
@@ -62,3 +62,4 @@ bh = banhandler.BanHandler()
 
 print "starting bot"
 bot = orcbot.ORCBot("~/.gnupg", "KEYID?", bh , sender)
+print "Orcbot started"
