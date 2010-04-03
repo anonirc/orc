@@ -61,7 +61,8 @@ class ORCBot:
         # Starts an instance of SingleServerIRCBot from the irclib project 
         # with OrcBot as its parent.
         self.irclibbot = IRCLibBot(self)
-    
+
+        
     def validate_pseudonym(self, user_input, nick, con):
         '''
         Takes the argument pseudonym and performs validation on the 
@@ -158,12 +159,12 @@ class ORCBot:
         elif ("connect" in cmd):
             # TODO: Activate this method once test enviroment is running
             # For now, validation checking is diabled
-
+            #
             #if(not self.validated_users.haskey(nick):
             #    con.privmsg(nick, "You are not validated and may not " +
             #    "connect. Type 'help validate' for instructions."
             #    return
-
+            #
             # This regexp returns a string array of word, which it parses by
             # seperating them by whitespace.
             pieces = [p for p in re.split("( |\\\".*?\\\"|'.*?')", cmd) if
@@ -236,6 +237,7 @@ class ORCBot:
                       "on a single line.")
             con.privmsg(nick, "You can obtain a pseudonym at http...")
              #TODO: Finish this method stub, tell the user where the PM is
+             
         elif (cmd=="help connect"):
             con.privmsg(nick, "Connects you to an IRC server of your choice.")
             con.privmsg(nick, "The command may take one or two arguments, "
@@ -256,7 +258,7 @@ class ORCBot:
     def enter_pseudonym(self, nick, cmd, con):
         '''
         This function is called as long as the user is in the validation 
-        dictionary and haven't finished their validation.
+        dictionary and havent finished their validation.
         '''
         if(cmd!="done"):
             self.validation_in_progress[nick] += cmd + "\n"
@@ -285,14 +287,13 @@ class IRCLibBot(SingleServerIRCBot):
     '''
     IRCLibBot from the irclib library.
     '''
-    def __init__(self, parent, nickname ="orcbot", server ="localhost", 
-                 port=6667):
+    def __init__(self, parent, nickname ="orcbot", server ="littlelaptop", 
+                 port=31337):
         self.orc = parent
         #TODO: Remove next line, its for debug only, OrcBot will run on 
         # localhost of the proxy
         server = "irc.oftc.net"
         SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
-
         print "Bot started.."
         self.start()
 

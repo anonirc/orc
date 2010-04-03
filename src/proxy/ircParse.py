@@ -18,6 +18,7 @@ def process_data(connection):
     the socket, and returns an Event of it
     """
     try:
+        print "recvin'"
         new_data = connection[0][0].recv(2**14)
     except socket.error, err:
         #Connection reset by peer
@@ -62,7 +63,7 @@ def process_data(connection):
             command = numeric_events[command]
             
 #    print("prefix %s, Target: %s\n"%(prefix, connection[1][0]))
-    
+    print "makin' event"
     e = event.Event(command, connection[0], connection[1], arguments)
 
     return e

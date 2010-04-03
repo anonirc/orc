@@ -1,4 +1,4 @@
-""" defines the serverConnectionDaemon
+b""" defines the serverConnectionDaemon
 """
 import threading
 import socket
