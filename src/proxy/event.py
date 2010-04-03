@@ -7,7 +7,7 @@ class Event:
     """Holds the type and handler function for irc events
     """
 
-    def __init__(self, event_type, source, target, data=None):
+    def __init__(self, event_type, source, target, orcbot, data=None):
         """Holds an event with event type, source, target,
         and optionally data needed for the event
         """
@@ -16,11 +16,13 @@ class Event:
         self.target = target
         self.data = data
         self.socket = source
+        self.orcbot = orcbot  
 
     def apply_handler(self):
         """the code that calls the event handler for the event
         type
         """
+        print "handlin'"
         tmp = self.event_type
         if hasattr(self, tmp):
             getattr(self, tmp)()
@@ -77,10 +79,11 @@ class Event:
         print self.source
         print "*******target**"
         print self.target
-        print "*****data***"
-    
-        print self.data[0]
-        if(self.data[0]=="#orcbot"):
+        print "*****data***"    
+        for d in self.data:
+            print d
+        
+        if(self.data[0]=="orcbot"):
             message = string.split(self.data[1], ":")
             #TODO input validation
             incoming.add_target(self.source,
