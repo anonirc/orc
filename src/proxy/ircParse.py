@@ -13,7 +13,7 @@ _rfc_1459_command_regexp = re.compile(
 #fair number of ircd's violate this
 _linesep_regexp = re.compile("\r?\n")
 
-def process_data(connection):
+def process_data(connection, orcbot_address):
     """ Takes in a connection, tries to read data from
     the socket, and returns an Event of it
     """
@@ -64,7 +64,7 @@ def process_data(connection):
             
 #    print("prefix %s, Target: %s\n"%(prefix, connection[1][0]))
     print "makin' event"
-    e = event.Event(command, connection[0], connection[1],None,  arguments)
+    e = event.Event(command, connection[0], connection[1], orcbot_address, arguments)
 
     return e
 

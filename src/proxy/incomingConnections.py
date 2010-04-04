@@ -68,7 +68,7 @@ def look_for_events(host, lconnections):
             print "loopin'"
             #goes through connections and calls ircParse's process_data
             #on them, returning an Event object, or None
-            events = map(lambda x:parse.process_data(x), lconnections.items())
+            events = map(lambda x:parse.process_data(x, orcbot), lconnections.items())
             #filters out the None's, in other words the ones without new data
             events = filter(lambda x:x!=None, events)
             for ev in events:

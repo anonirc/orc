@@ -80,8 +80,7 @@ class Event:
         print "*******target**"
         print self.target
         print "*****data***"    
-        for d in self.data:
-            print d
+        print self.data
         
         if(self.data[0]=="orcbot"):
             message = string.split(self.data[1], ":")
