@@ -36,16 +36,9 @@ if(testuser):
 # user's home directory
 #
 # TODO: decide whether this should be in a config file
-# TODO: Probably won't need the socket import here, as the gethostname
-# will be removed
 #settings for accepting connections
 HOST = socket.gethostname()
 PORT = 31337
-
-#TODO: Get a working proxy implementation up
-#TODO: Add keyid to this ORCBot
-#TODO: Fork threads if neccesary
-#TODO:
 
 #should set up sender and receiver threads
 print "starting receiver"
