@@ -7,7 +7,7 @@ class Event:
     """Holds the type and handler function for irc events
     """
 
-    def __init__(self, event_type, source, target, orcbot, data=None):
+    def __init__(self, event_type, source, target, orcbot, raw, data=None):
         """Holds an event with event type, source, target,
         and optionally data needed for the event
         """
@@ -16,6 +16,7 @@ class Event:
         self.target = target
         self.data = data
         self.socket = source
+        self.message = raw
         self.orcbot = orcbot  
 
     def apply_handler(self):
@@ -81,15 +82,15 @@ class Event:
         print self.target
         print "*****data***"    
         print self.data
-        
+        print "***orcbot****"
+        print self.orcbot
         if(self.data[0]=="orcbot"):
-            message = string.split(self.data[1], ":")
-            #TODO input validation
-            incoming.add_target(self.source,
-                                server.connect_to_server(
-                                    "insert nick here",
-                                    self.source,
-                                    message[1]))
+            print "target = orcbot"
+            self.target = self.orcbot
+
+        #TODO alter message to reflect hostmasks and such
+        self.target[0].send(self.message)
+            
     def privnotice(self):
         """TODO
         """

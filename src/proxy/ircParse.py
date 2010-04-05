@@ -62,9 +62,10 @@ def process_data(connection, orcbot_address):
         if command in numeric_events:
             command = numeric_events[command]
             
-#    print("prefix %s, Target: %s\n"%(prefix, connection[1][0]))
     print "makin' event"
-    e = event.Event(command, connection[0], connection[1], orcbot_address, arguments)
+    print "**ircparse orcbot"
+    print orcbot_address
+    e = event.Event(command, connection[0], connection[1], orcbot_address, new_data, arguments)
 
     return e
 
