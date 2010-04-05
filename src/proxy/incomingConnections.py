@@ -9,7 +9,6 @@ import ircParse as parse
 #connections[] holds a tuple containing the socket object of a connection,
 #and the socket object of the server it's connected to
 connections = {}
-orcbot = None
 
 class IncomingConnectionDaemon(threading.Thread):
     """ Class for receiving incoming connections and handle
@@ -37,11 +36,14 @@ class IncomingConnectionDaemon(threading.Thread):
         SOCK = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         SOCK.bind((self.host,self.port))
         SOCK.listen(self.backlog)
-        #starts the method that looks for events in connections
-        spawn_look_for_events(self.host, connections)
-        #first connection should be from orcbot
+
         orcbot = SOCK.accept()
         print "OrcBot connected"
+        print orcbot
+        #starts the method that looks for events in connections
+        spawn_look_for_events(self.host, connections, orcbot)
+        #first connection should be from orcbot
+        
         while 1:
             connections[SOCK.accept()]= None
             print("connected")
@@ -49,16 +51,16 @@ class IncomingConnectionDaemon(threading.Thread):
 def get_orcbot():
     return orcbot
             
-def spawn_look_for_events(lhost, lconnections):
+def spawn_look_for_events(lhost, lconnections, orcbot):
     """Starts the look_for_events function in  new thread
     and passes connections to it
     """
     try:
-        thread.start_new_thread(look_for_events, (lhost, lconnections, ))
+        thread.start_new_thread(look_for_events, (lhost, lconnections, orcbot))
     except :
         print "Error: unable to start thread"
         
-def look_for_events(host, lconnections):
+def look_for_events(host, lconnections, orcbot):
     """
     Looks for new data in all connections
     Arguments: host, connectxions
@@ -66,6 +68,8 @@ def look_for_events(host, lconnections):
     while 1:
         if(lconnections):
             print "loopin'"
+            print orcbot
+            print
             #goes through connections and calls ircParse's process_data
             #on them, returning an Event object, or None
             events = map(lambda x:parse.process_data(x, orcbot), lconnections.items())
