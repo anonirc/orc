@@ -35,16 +35,15 @@ if(testuser):
 # testing purposes and the resources the script requires reside on the
 # user's home directory
 #
-# TODO: decide whether this should be in a config file
-#settings for accepting connections
+# TODO: Make the init script load constants from config file
 
-HOST = "localhost"
-PORT = 6667
+host = "localhost"
+port = 6667
 
 #should set up sender and receiver threads
 print "starting receiver"
 receiver = incoming.IncomingConnectionDaemon()
-receiver.init(HOST, PORT)
+receiver.init(host, port)
 receiver.start()
 
 print "starting sender"
@@ -55,4 +54,5 @@ print "starting banhandler"
 bh = banhandler.BanHandler()
 
 print "starting bot"
-bot = orcbot.ORCBot("~/.gnupg", "KEYID?", bh , sender)
+pmservername = "http://nameofpmserver.org/"
+bot = orcbot.ORCBot("~/.gnupg", "KEYID?", bh , sender, pmservername)

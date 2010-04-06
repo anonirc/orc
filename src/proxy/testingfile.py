@@ -2,7 +2,7 @@ import thread
 import socket
 import time
 
-import incomingConnections as ic
+import incomingconnections as ic
 
 
 #settings for accepting connections
@@ -25,5 +25,5 @@ def runDumbSender(message, host, port):
     conn.send(message)
 
 #for i in range(5):
- #   time.sleep(1)
+#   time.sleep(1)
 thread.start_new_thread(runDumbSender, (":guntbert!~re@unaffiliated/guntbert PRIVMSG #orcbot :connect:littlelaptop", HOST, PORT ))

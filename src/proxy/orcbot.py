@@ -19,29 +19,26 @@ import re
 from ircbot import SingleServerIRCBot
 from irclib import nm_to_n
 
-import banhandler
 import validated_users
 
-class ORCBot:  
+class ORCBot:
     '''
     This is the bot which serves as the communication medium between the proxy
     and the end-user.
     
     This program is reliant on code written by Joel Rosdahl <joel@rosdahl.net>
     of the irclib project http://python-irclib.sourceforge.net/
-    Code used includes all references to ircbot or irclib. It is used without 
-    the authors permission, but in compliance with the license terms of irclib.
-    
-    Communication to the proxy goes should go through system calls. 
-    Communication with the user goes through the IRC protocol.
+    Code used includes all references to ircbot or irclib.
     '''
-    def __init__(self, keyring_loc, key_id, ban_db, scd):
+    #TODO: Handle exceptions throughout the class?
+    def __init__(self, keyring_loc, key_id, ban_db, scd, pm_name):
         '''
         Initializes the OrcBot object.
         Takes arguments: 
         - keyring_loc, and key id - used by gnupg for the validation process
         - ban_db - an instance of the banhandler, share by the other classes
         - scd - the instance of the ServerConnectionDaemon 
+        - pm_name - the URI for the Pseudonym Manager
         '''
         # This dictonary establishes whether a user is currently undergoing a
         # validation process. Basicly if the user is present in the list, 
@@ -54,11 +51,12 @@ class ORCBot:
         # We need to be able ask the ServerConnectionDaemon for connects
         self.scd = scd
         # We keep a list of connections that have validated themselves
-        self.vu = validated_users.ValidatedUsers()
-        # TODO: Figure out how to and what to store in that dict
+        self.val_users = validated_users.ValidatedUsers()
+        # To tell the iusers of orcbot where they can aquire a pseuodonym
+        self.pm_name = pm_name
         # OrcBot needs to know if users are authorized to connect to servers 
         # and channels therefore it contains a banhandler.
-        self.bh = banhandler.BanHandler()
+        self.ban_han = ban_db
         # Starts an instance of SingleServerIRCBot from the irclib project 
         # with OrcBot as its parent.
         self.irclibbot = IRCLibBot(self)
@@ -161,7 +159,7 @@ class ORCBot:
             # TODO: Activate this method once test enviroment is running
             # For now, validation checking is diabled
             #
-            #if(not self.vu.haskey(nick):
+            #if(not self.val_users.haskey(nick):
             #    con.privmsg(nick, "You are not validated and may not " +
             #    "connect. Type 'help validate' for instructions."
             #    return
@@ -182,22 +180,22 @@ class ORCBot:
                 ". In moments you will be able to join a channel." +
                 " Type 'help join' for more information.")
                 # Get the connection object from SCD and check if it is banned
-                serverban = self.bh.is_banned_from_server(
-                self.vu.get(self.scd.get_connection(nick), server))
+                serverban = self.ban_han.is_banned_from_server(
+                self.scd.get_connection(nick), server)
                 if (serverban):
                     con.privmsg(nick, "ERROR: You are banned from " +
                     "this server.")
                 else:
                     # Asks ServerConnectionDaemon to connect this user to
                     # the specified server
-                    self.scd.connect_to_server(nick, server, port).
+                    self.scd.connect_to_server(nick, server, port)
 
             elif(len(pieces[2]) > 1):
                 server =  pieces[1] # Server
                 port =  pieces[2]
                 if(re.match("[0-9]+", port)):
-                    serverban = self.bh.is_banned_from_server(
-                    self.vu.get(nick), server)
+                    serverban = self.ban_han.is_banned_from_server(
+                    self.val_users[self.scd.get_connection(nick)], server)
                     if (serverban):
                         con.privmsg(nick, "ERROR: You are banned from " +
                         "this server.")
@@ -229,11 +227,13 @@ class ORCBot:
             
         elif (cmd=="help validate"):
             con.privmsg(nick, "Validates a pseudonym, it makes orcbot " + 
-                      "temporarily accept any data you send it for validation.")
+                      "temporarily accept any data you send it for " +
+                      "validation, paste the pseudonym you've obtained line " +
+                      "for line and ignore any empty lines.")
             con.privmsg(nick, "The process is concluded by typing 'done'. " + 
                       "on a single line.")
-            con.privmsg(nick, "You can obtain a pseudonym at http...")
-        #TODO: Finish this method stub, tell the user where the PM is
+            con.privmsg(nick, "You can obtain a pseudonym at " + 
+                        self.pm_name)
              
         elif (cmd=="help connect"):
             con.privmsg(nick, "Connects you to an IRC server of your choice.")
@@ -241,12 +241,6 @@ class ORCBot:
                       + "servername and port. If no port is defined, the " + 
                       "standard port is selected by default.")
             con.privmsg(nick, "Example: 'connect irc.oftc.net 6667'")
-
-        elif (cmd=="die"):
-            #TODO: Remove this, its a debugging method
-            print "Terminating by user request.."
-            con.privmsg(nick, "Bye now..")
-            sys.exit(0)
             
         else:
             con.notice(nick, "You wrote: '" + cmd + "' this is not a " + 
@@ -271,7 +265,7 @@ class ORCBot:
                 con.privmsg(nick, "Validation performed successfully, " + 
                           "you may now connect.")
                 con.privmsg(nick, "For instructions type 'help connect'")
-                self.vu.add(self.scd.get_connection(nick), 
+                self.val_users.add_connection(self.scd.get_connection(nick), 
                             self.create_md5(pseudonym))
                 
             else:
@@ -293,9 +287,6 @@ class IRCLibBot(SingleServerIRCBot):
     def __init__(self, parent, nickname ="orcbot", server ="localhost", 
                  port=6667):
         self.orc = parent
-        #TODO: Remove next line, its for debug only, OrcBot will run on 
-        # localhost of the proxy
-        #server = "irc.oftc.net"
         
         SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
         self.start()

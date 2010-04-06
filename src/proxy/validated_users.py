@@ -5,6 +5,7 @@ class ValidatedUsers():
     '''
     def __init__(self):
         #TODO work out communication by depending classes
+        #TODO: Handle exceptions?
         self.dictionary = dict()
         
     def add_connection(self, connection, pseudonym):
@@ -19,9 +20,4 @@ class ValidatedUsers():
         # possible triggered by an event and may not need implementation
         return
         
-        
-        
-#     TODO: find out how to declare and initialize a Dict. Write getters
-# and setters. Write Boolean function to check
-# if a connectino is validated
 
