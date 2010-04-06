@@ -1,18 +1,18 @@
 class ValidatedUsers():
     '''
-    A class to hold the connections who are
+    A object to hold the connections who are
     currently connected and whose pseudonyms have been validated
     '''
     def __init__(self):
         #TODO work out communication by depending classes
-        self.validated_users = dict()
-    def add(self, connection, pseudonym):
-        self.validated_users[pseudonym] = connection
-        return
-    def remove_pseudonym(self, pseudonym):
-        return
-    def remove_connection(self):
-        return
+        self.dictionary = dict()
+        
+    def add_connection(self, connection, pseudonym):
+        self.dictionary[connection] = pseudonym
+
+    def remove_connection(self, connection):
+        del self.dictionary[connection]
+        
     '''
     '''
     def remove_disconnected_users(self):

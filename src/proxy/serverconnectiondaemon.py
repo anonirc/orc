@@ -51,3 +51,11 @@ def connect_to_server(nick, connection, server_address,
     
     CONNECTIONS[tmp] = connection
     return tmp
+
+def get_connection(self, nick):
+    '''
+    Return the connection object so that ORCBot can store it in it's validated
+    user dictionary.
+    '''
+    #TODO: Write this function
+    return "aConnectionObject"

@@ -12,14 +12,15 @@ from __future__ import with_statement
 import sys
 
 import GnuPGInterface
+from hashlib import md5
 import random
 import re
-
 
 from ircbot import SingleServerIRCBot
 from irclib import nm_to_n
 
 import banhandler
+import validated_users
 
 class ORCBot:  
     '''
@@ -52,12 +53,12 @@ class ORCBot:
         self.key_id = key_id
         # We need to be able ask the ServerConnectionDaemon for connects
         self.scd = scd
-        # We keep a list of users that have validated themselves
-        self.validated_users = dict()
+        # We keep a list of connections that have validated themselves
+        self.vu = validated_users.ValidatedUsers()
         # TODO: Figure out how to and what to store in that dict
         # OrcBot needs to know if users are authorized to connect to servers 
         # and channels therefore it contains a banhandler.
-        self.banhandler = banhandler.BanHandler()
+        self.bh = banhandler.BanHandler()
         # Starts an instance of SingleServerIRCBot from the irclib project 
         # with OrcBot as its parent.
         self.irclibbot = IRCLibBot(self)
@@ -160,7 +161,7 @@ class ORCBot:
             # TODO: Activate this method once test enviroment is running
             # For now, validation checking is diabled
             #
-            #if(not self.validated_users.haskey(nick):
+            #if(not self.vu.haskey(nick):
             #    con.privmsg(nick, "You are not validated and may not " +
             #    "connect. Type 'help validate' for instructions."
             #    return
@@ -180,36 +181,32 @@ class ORCBot:
                 str(port) +
                 ". In moments you will be able to join a channel." +
                 " Type 'help join' for more information.")
-                serverban = self.banhandler.is_banned_from_server(
-                self.validated_users.get(nick), server)
+                # Get the connection object from SCD and check if it is banned
+                serverban = self.bh.is_banned_from_server(
+                self.vu.get(self.scd.get_connection(nick), server))
                 if (serverban):
                     con.privmsg(nick, "ERROR: You are banned from " +
                     "this server.")
                 else:
-                    #TODO: Activate method once SCD runs
-                    #self.scd.connect_to_server(nick, con, server)
-                    #TODO: Find out how to extract socket object from
-                    # irclib's bot. Test towards SCD when it's running.
-                    con.destroy()
+                    # Asks ServerConnectionDaemon to connect this user to
+                    # the specified server
+                    self.scd.connect_to_server(nick, server, port).
 
             elif(len(pieces[2]) > 1):
                 server =  pieces[1] # Server
                 port =  pieces[2]
                 if(re.match("[0-9]+", port)):
-                    serverban = self.banhandler.is_banned_from_server(
-                    self.validated_users.get(nick), server)
+                    serverban = self.bh.is_banned_from_server(
+                    self.vu.get(nick), server)
                     if (serverban):
                         con.privmsg(nick, "ERROR: You are banned from " +
                         "this server.")
                     else:
-                        #TODO: Find out how to extract socket object from
-                        # irclib's bot. Test towards SCD when it's running.
                         con.privmsg(nick, "Connecting you to " + server + 
                         " at port " + port +  ". In a moment you will" + 
                         "be able to join a channel, type 'help join' for " +
                         "instructions.")
-                        #TODO: Activate method once SCD runs
-                        #self.scd.connect_to_server(nick, con, server)
+                        self.scd.connect_to_server(nick, server, port)
                 else:
                     con.privmsg(nick, "Port cannot contain anything " +
                     "but numbers. Try again. For help type 'help connect'")
@@ -236,7 +233,7 @@ class ORCBot:
             con.privmsg(nick, "The process is concluded by typing 'done'. " + 
                       "on a single line.")
             con.privmsg(nick, "You can obtain a pseudonym at http...")
-             #TODO: Finish this method stub, tell the user where the PM is
+        #TODO: Finish this method stub, tell the user where the PM is
              
         elif (cmd=="help connect"):
             con.privmsg(nick, "Connects you to an IRC server of your choice.")
@@ -266,8 +263,6 @@ class ORCBot:
                 self.validation_in_progress[nick] += "\n"
         else:
             pseudonym = self.validation_in_progress.get(nick)
-            # Used for debugging, since we now have multilined input we wont 
-            # bother to print the pseudonym back to the user for now.
             con.privmsg(nick, "Your certificate was retrieved, validating..")
             validation_result = self.validate_pseudonym(pseudonym, nick, con)
             # Remove nick from the validation process list
@@ -276,12 +271,20 @@ class ORCBot:
                 con.privmsg(nick, "Validation performed successfully, " + 
                           "you may now connect.")
                 con.privmsg(nick, "For instructions type 'help connect'")
-                # self.validated_users.add(connection, pseudonym)
-                #TODO: Figure out how the connection or nick should be stored
+                self.vu.add(self.scd.get_connection(nick), 
+                            self.create_md5(pseudonym))
+                
             else:
                 con.privmsg(nick, "Validation failed, check that you are " + 
                           "using a valid pseudonym. Type 'help validate' " +
                           "for more information." )
+                
+    def create_md5(self, pseudonym):
+        '''
+        Create a md5 checksum from a string
+        '''
+        pseudonymasmd5 = md5(pseudonym)
+        return pseudonymasmd5.hexdigest()
     
 class IRCLibBot(SingleServerIRCBot):
     '''
