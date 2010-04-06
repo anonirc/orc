@@ -37,8 +37,9 @@ if(testuser):
 #
 # TODO: decide whether this should be in a config file
 #settings for accepting connections
-HOST = socket.gethostname()
-PORT = 31337
+
+HOST = "localhost"
+PORT = 6667
 
 #should set up sender and receiver threads
 print "starting receiver"
@@ -55,4 +56,3 @@ bh = banhandler.BanHandler()
 
 print "starting bot"
 bot = orcbot.ORCBot("~/.gnupg", "KEYID?", bh , sender)
-print "Orcbot started"

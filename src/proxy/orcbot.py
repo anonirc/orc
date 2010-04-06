@@ -287,16 +287,14 @@ class IRCLibBot(SingleServerIRCBot):
     '''
     IRCLibBot from the irclib library.
     '''
-    #TODO: Probably not going to run on port 31337, or only my laptop
-    def __init__(self, parent, nickname ="orcbot", server ="littlelaptop", 
-                 port=31337):
+    def __init__(self, parent, nickname ="orcbot", server ="localhost", 
+                 port=6667):
         self.orc = parent
         #TODO: Remove next line, its for debug only, OrcBot will run on 
         # localhost of the proxy
         #server = "irc.oftc.net"
         
         SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
-        print "Bot started.."
         self.start()
 
     #TODO: Add DCC support 
