@@ -17,9 +17,13 @@ def process_data(connection, orcbot_address):
     """ Takes in a connection, tries to read data from
     the socket, and returns an Event of it
     """
+    e = []
     try:
         print "recvin'"
         new_data = connection[0][0].recv(2**14)
+        print "*********"
+        print new_data
+        
     except socket.error, err:
         #Connection reset by peer
         print("Socket errror")
@@ -53,20 +57,15 @@ def process_data(connection, orcbot_address):
 
         if msg.group("argument"):
             arg = msg.group("argument").split(" :", 1)
-            print arg
             arguments = arg[0].split()
             if len(arg) == 2:
                 arguments.append(arg[1])
 
         # Translate numerics into more readable strings.
         if command in numeric_events:
-            command = numeric_events[command]
-            
-    print "makin' event"
-    print "**ircparse orcbot"
-    print orcbot_address
-    e = event.Event(command, connection[0], connection[1], orcbot_address, new_data, arguments)
-
+            command = numeric_events[command]     
+        print "makin' event"
+        e.append(event.Event(command, connection[0], connection[1], orcbot_address, line, arguments))
     return e
 
 
