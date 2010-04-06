@@ -11,6 +11,7 @@ import os
 
 # TODO: Possibly remove the socket import
 import socket
+import ConfigParser
 import orcbot
 import banhandler as banhandler
 import incomingconnections as incoming
@@ -30,20 +31,20 @@ if("root" in output):
 elif("www-data" in output):
     testuser = False
 if(testuser):
-    print "Unknow user, globals will default to you home directory."
+    print "Unknown user, make sure you have the correct permissions for GPG " + 
+    "validation"
 # If another user then root or www-data is running, we assume it's for
 # testing purposes and the resources the script requires reside on the
 # user's home directory
-#
-# TODO: Make the init script load constants from config file
 
-host = "localhost"
-port = 6667
+config = ConfigParser.RawConfigParser()
+config.read('orc.conf')
 
 #should set up sender and receiver threads
 print "starting receiver"
 receiver = incoming.IncomingConnectionDaemon()
-receiver.init(host, port)
+receiver.init(config.get('ORC', 'icd_host'), 
+              config.get('ORC', 'icd_port'))
 receiver.start()
 
 print "starting sender"
@@ -51,8 +52,16 @@ sender = outgoing.ServerConnectionDaemon()
 sender.start()
 
 print "starting banhandler"
-bh = banhandler.BanHandler()
+bh = banhandler.BanHandler(config.get('ORC', 'bh_host'),
+                           config.get('ORC', 'bh_user'), 
+                           config.get('ORC', 'bh_passwd'), 
+                           config.get('ORC', 'bh_db'))
+
+pm_name = config.get('ORC', 'pm_name')
 
 print "starting bot"
-pmservername = "http://nameofpmserver.org/"
-bot = orcbot.ORCBot("~/.gnupg", "KEYID?", bh , sender, pmservername)
+bot = orcbot.ORCBot(config.get('ORC', 'orcbot_keyring'), 
+                    config.get('ORC', 'orcbot_keyid'), 
+                    bh, 
+                    sender, 
+                    config.get('ORC', 'orcbot_pmname'))

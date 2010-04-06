@@ -9,7 +9,6 @@ Created on 9. mars 2010
 '''
 # The with statement is not available in Python 2.5, so import it
 from __future__ import with_statement
-import sys
 
 import GnuPGInterface
 from hashlib import md5
