@@ -2,6 +2,7 @@ b""" defines the serverConnectionDaemon
 """
 import threading
 import socket
+import time
 
 import ircParse as parse
 
@@ -11,7 +12,6 @@ CONNECTIONS = {}
 class serverConnectionDaemon(threading.Thread):
     """Opens connections to servers and polls for events
     on the socket object
-    TODO skrive fornuftig docstring
     """
 
     def __init__(self):
@@ -25,6 +25,7 @@ class serverConnectionDaemon(threading.Thread):
         - `self`:
         """
         while 1:
+            time.sleep(1)
             #goes through connections and calls ircParse's
             #on them, returning an Event object, or None            
             events = map(lambda x:parse.process_data(x), CONNECTIONS.items())
