@@ -1,6 +1,12 @@
 import string
 import serverConnectionDaemon as server
 import incomingConnections as incoming
+
+#holds the made up nicks that each connection has when talking
+#with orcbot
+orcbot_nicks = []
+#TODO: Replace index with hash of something, maybe timestamp
+
 """ Defines the Event class
 """
 class Event:
@@ -26,6 +32,11 @@ class Event:
         print "handlin'"
         tmp = self.event_type
         if hasattr(self, tmp):
+            #if message is for orcbot, set orcbot as target
+            if(self.data[0]=="orcbot"):
+                print "target = orcbot"
+                self.target = self.orcbot
+            
             getattr(self, tmp)()
 
     def get_type(self):
@@ -74,20 +85,33 @@ class Event:
     def privmsg(self):
         """ Handles privmsg event
         """
+        print "Raw message"
+        print self.message
         print 
         print self.event_type
         print "****Source**"
         print self.source
-        print "*******target**"
-        print self.target
         print "*****data***"    
         print self.data
         print "***orcbot****"
         print self.orcbot
+
+        #if message is for orcbot, set orcbot as target
         if(self.data[0]=="orcbot"):
             print "target = orcbot"
             self.target = self.orcbot
-
+            if(orcbot_nicks.count(self.source)==0):
+                orcbot_nicks.append(self.source)
+            self.message = ":" + str(orcbot_nicks.index(self.source)) + " " + self.message
+        #TODO: The nicks for orcbot chats shouldnt be integers, and the lookup shouldnt
+        #be an array access
+        if(self.source == self.orcbot):
+            print "source is orcbot"
+            self.target = orcbot_nicks[int(self.data[0])]
+            self.message = ":orcbot "+self.message
+        print "*******target**"
+        print self.target
+            
         #TODO alter message to reflect hostmasks and such
         self.target[0].send(self.message)
             
