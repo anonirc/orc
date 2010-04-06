@@ -31,8 +31,8 @@ if("root" in output):
 elif("www-data" in output):
     testuser = False
 if(testuser):
-    print "Unknown user, make sure you have the correct permissions for GPG " + 
-    "validation"
+    print ("Unknown user, make sure you have the correct permissions for GPG" + 
+    " validation")
 # If another user then root or www-data is running, we assume it's for
 # testing purposes and the resources the script requires reside on the
 # user's home directory
@@ -56,8 +56,6 @@ bh = banhandler.BanHandler(config.get('ORC', 'bh_host'),
                            config.get('ORC', 'bh_user'), 
                            config.get('ORC', 'bh_passwd'), 
                            config.get('ORC', 'bh_db'))
-
-pm_name = config.get('ORC', 'pm_name')
 
 print "starting bot"
 bot = orcbot.ORCBot(config.get('ORC', 'orcbot_keyring'), 
