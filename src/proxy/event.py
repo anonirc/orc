@@ -1,6 +1,6 @@
 import string
-import serverConnectionDaemon as server
-import incomingConnections as incoming
+import serverconnectiondaemon as server
+import incomingconnections as incoming
 
 #holds the made up nicks that each connection has when talking
 #with orcbot

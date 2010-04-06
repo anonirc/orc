@@ -5,7 +5,7 @@ import thread
 import socket
 import time
 
-import ircParse as parse
+import ircparse as parse
 
 #connections[] holds a tuple containing the socket object of a connection,
 #and the socket object of the server it's connected to

@@ -13,8 +13,8 @@ import os
 import socket
 import orcbot
 import banhandler as banhandler
-import incomingConnections as incoming
-import serverConnectionDaemon as outgoing
+import incomingconnections as incoming
+import serverconnectiondaemon as outgoing
 
 # Check what user has initiated the script
 process = os.popen("whoami")
@@ -48,7 +48,7 @@ receiver.init(HOST, PORT)
 receiver.start()
 
 print "starting sender"
-sender = outgoing.serverConnectionDaemon()
+sender = outgoing.ServerConnectionDaemon()
 sender.start()
 
 print "starting banhandler"

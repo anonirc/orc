@@ -4,12 +4,12 @@ import threading
 import socket
 import time
 
-import ircParse as parse
+import ircparse as parse
 
 
 CONNECTIONS = {}
 
-class serverConnectionDaemon(threading.Thread):
+class ServerConnectionDaemon(threading.Thread):
     """Opens connections to servers and polls for events
     on the socket object
     """
