@@ -71,7 +71,6 @@ def look_for_events(host, lconnections, orcbot):
     Arguments: host, connectxions
     """
     while 1:
-        #TODO: remove this when the app doesnt kill all performance anymore
         time.sleep(1)
         if(lconnections):
             print "loopin'"

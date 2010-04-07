@@ -95,8 +95,6 @@ class Event:
             self.target = self.orcbot
             self.message = ":" + socket_to_nick[self.source] + "!~@localhost " + self.message
 
-        #TODO: The nicks for orcbot chats shouldnt be integers, and the lookup shouldnt
-        #be an array access
         if(self.source == self.orcbot):
             print "source is orcbot"
             self.target = nick_to_socket[self.data[0]]
@@ -106,7 +104,6 @@ class Event:
         print self.target
         print "*******message to send"
         print self.message
-            
         #TODO alter message to reflect hostmasks and such
         try:
             self.target[0].sendall(self.message)
@@ -140,4 +137,10 @@ class Event:
     def pong(self):
         """TODO
         """
+def connect(nick, server_address = "irc.oftc.net",
+            port = 6667, password = None):
+    incoming.add_target(nick_to_socket[nick],
+                        server.connect_to_server(
+                            nick, nick_to_socket[nick],
+                            server_address, password, port))
 
