@@ -29,12 +29,12 @@ class BanHandler:
     This module is the abstraction layer for the banlist database of the ORC
     proxy server. It contains all the functions to manipulate that database.
     '''
-    def __init__(self, host, user, passwd, db):
+    def __init__(self, host, user, passwd, database):
         '''
         Creates the BanHandler object and initializes a connection to the mySQL
         database.
         '''
-        self.con = MySQLdb.connect(host, user, passwd,db)
+        self.con = MySQLdb.connect(host, user, passwd, database)
         self.cursor = self.con.cursor()
         
     def add_ban(self, duration, pseudonym, network, channel, serverban):
