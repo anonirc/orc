@@ -88,8 +88,6 @@ class Event:
         """
         print "Raw message"
         print self.message
-        print 
-        print self.event_type
         print "****Source**"
         print self.source
         #if message is for orcbot, set orcbot as target
@@ -105,7 +103,7 @@ class Event:
         if(self.source == self.orcbot):
             print "source is orcbot"
             self.target = orcbot_nicks[int(self.data[0])]
-            self.message = ":orcbot "+self.message
+            self.message = ":orcbot!~@localhost "+self.message
         self.message = self.message +"\r\n"
         print "*******target**"
         print self.target
@@ -114,7 +112,7 @@ class Event:
             
         #TODO alter message to reflect hostmasks and such
         try:
-            self.target[0].send(self.message)
+            self.target[0].sendall(self.message)
         except socket.error, err:
             print "can't send"
             print err

@@ -50,6 +50,7 @@ class IncomingConnectionDaemon(threading.Thread):
             try:
                 tmp = SOCK.accept()
                 tmp[0].settimeout(.5)
+                tmp[0].send(":orcbot 001 :Welcome to ORC\r\n")
                 connections[tmp]= None
                 print("connected")
             finally:
