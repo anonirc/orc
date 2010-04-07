@@ -39,16 +39,18 @@ class IncomingConnectionDaemon(threading.Thread):
         SOCK.listen(self.backlog)
         
         orcbot = SOCK.accept()
+        orcbot[0].settimeout(.5)
         print "OrcBot connected"
         print orcbot
-        socket.setdefaulttimeout(0)
         #starts the method that looks for events in connections
         spawn_look_for_events(self.host, connections, orcbot)
         #first connection should be from orcbot
         
         while 1:
             try:
-                connections[SOCK.accept()]= None
+                tmp = SOCK.accept()
+                tmp[0].settimeout(.5)
+                connections[tmp]= None
                 print("connected")
             finally:
                 time.sleep(1)
