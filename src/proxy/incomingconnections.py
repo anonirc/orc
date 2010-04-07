@@ -41,7 +41,7 @@ class IncomingConnectionDaemon(threading.Thread):
         orcbot = SOCK.accept()
         print "OrcBot connected"
         print orcbot
-        orcbot[0].settimeout(.5)
+        socket.setdefaulttimeout(0)
         #starts the method that looks for events in connections
         spawn_look_for_events(self.host, connections, orcbot)
         #first connection should be from orcbot
