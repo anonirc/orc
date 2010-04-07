@@ -151,7 +151,7 @@ class ORCBot:
             # in a validation process. And we should fetch the pseudonym. 
             self.enter_pseudonym(nick, cmd, con)
 
-        elif (cmd=="validate"):
+        elif (cmd == "validate"):
             # Add to dictionary, add initialize the pseudonym as a string
             con.privmsg(nick, "Validation begun, paste your pseudonym now, " +
             "it is important that you paste the pseudonym in the format you " +
@@ -160,7 +160,7 @@ class ORCBot:
             " Complete the process by typing 'done' on a single line.")
             self.validation_in_progress[nick] = ""
 
-        elif ("connect" in cmd):
+        elif (cmd[0:6] == "connect"):
             # TODO: Activate this method once test enviroment is running
             # For now, validation checking is diabled
             #
@@ -207,8 +207,7 @@ class ORCBot:
                     else:
                         con.privmsg(nick, "Connecting you to " + server + 
                         " at port " + port +  ". In a moment you will" + 
-                        "be able to join a channel, type 'help join' for " +
-                        "instructions.")
+                        "be able to join a channel.")
                         self.scd.connect_to_server(nick, server, port)
                 else:
                     con.privmsg(nick, "Port cannot contain anything " +
@@ -225,8 +224,8 @@ class ORCBot:
             con.privmsg(nick, "validate - Validate a pseudonym.")
             con.privmsg(nick, "connect  - Connect to an IRC server. " + 
                       "requires validation.")
-            con.privmsg(nick, "join     - Join a channel. requires " + 
-                      "validation and a active server connection.")
+            #con.privmsg(nick, "join     - Join a channel. requires " + 
+                      #"validation and a active server connection.")
             con.privmsg(nick, "Type 'help <commandname>' to get more info" + 
                       "about each command.")
             
