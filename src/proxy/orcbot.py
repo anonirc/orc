@@ -160,7 +160,7 @@ class ORCBot:
             " Complete the process by typing 'done' on a single line.")
             self.validation_in_progress[nick] = ""
 
-        elif (cmd[0:6] == "connect"):
+        elif (cmd[0:7] == "connect"):
             # TODO: Activate this method once test enviroment is running
             # For now, validation checking is diabled
             #
