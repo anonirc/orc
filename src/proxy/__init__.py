@@ -8,12 +8,10 @@ the test enviroment of the proxy.
 All global variables will be configured from here.
 '''
 import os
-
-# TODO: Possibly remove the socket import
-import socket
 import ConfigParser
+
 import orcbot
-import banhandler as banhandler
+import banhandler
 import incomingconnections as incoming
 import serverconnectiondaemon as outgoing
 
@@ -37,6 +35,7 @@ if(testuser):
 # testing purposes and the resources the script requires reside on the
 # user's home directory
 
+#Reading the config from file
 config = ConfigParser.RawConfigParser()
 config.read('orc.conf')
 
