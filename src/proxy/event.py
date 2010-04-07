@@ -96,7 +96,7 @@ class Event:
             self.target = self.orcbot
             if(orcbot_nicks.count(self.source)==0):
                 orcbot_nicks.append(self.source)
-                self.message = ":" + str(orcbot_nicks.index(self.source)) + "!~@localhost " + self.message
+            self.message = ":" + str(orcbot_nicks.index(self.source)) + "!~@localhost " + self.message
 
         #TODO: The nicks for orcbot chats shouldnt be integers, and the lookup shouldnt
         #be an array access
