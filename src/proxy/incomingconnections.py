@@ -43,25 +43,26 @@ class IncomingConnectionDaemon(threading.Thread):
         print "OrcBot connected"
         print orcbot
         #starts the method that looks for events in connections
-        spawn_look_for_events(self.host, CONNECTIONS, orcbot)
+        spawn_look_for_events(CONNECTIONS, orcbot)
         #first connection should be from orcbot
         
         while 1:
             try:
                 tmp = sock.accept()
                 tmp[0].settimeout(.5)
-                tmp[0].send(":orcbot 001 orcbot :Welcome to ORC\r\n")
+                tmp[0].send(":orcbot 001 orcbot :Welcome to ORC. Type " +
+                " /msg orcbot to begin.\r\n")
                 CONNECTIONS[tmp] = None
                 print("connected")
             finally:
                 time.sleep(1)
                 
-def spawn_look_for_events(lhost, lconnections, orcbot):
+def spawn_look_for_events(lconnections, orcbot):
     """Starts the look_for_events function in  new thread
     and passes connections to it
     """
     try:
-        thread.start_new_thread(look_for_events, (lhost, lconnections, orcbot))
+        thread.start_new_thread(look_for_events, (lconnections, orcbot))
     except :
         print "Error: unable to start thread"
         
