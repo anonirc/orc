@@ -43,7 +43,7 @@ config.read('orc.conf')
 print "starting receiver"
 receiver = incoming.IncomingConnectionDaemon()
 receiver.init(config.get('ORC', 'icd_host'), 
-              config.get('ORC', 'icd_port'))
+              int(config.get('ORC', 'icd_port')))
 receiver.start()
 
 print "starting sender"
