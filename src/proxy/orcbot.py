@@ -30,11 +30,11 @@ class ORCBot:
     Code used includes all references to ircbot or irclib.
     '''
     #TODO: Handle exceptions throughout the class?
-    def __init__(self, keyring_loc, key_id, ban_db, scd, pm_name):
+    def __init__(self, server_info, gpg_info, ban_db, scd, pm_name):
         '''
         Initializes the OrcBot object.
         Takes arguments: 
-        - keyring_loc, and key id - used by gnupg for the validation process
+        - gpg_info, and key id - used by gnupg for the validation process
         - ban_db - an instance of the banhandler, share by the other classes
         - scd - the instance of the ServerConnectionDaemon 
         - pm_name - the URI for the Pseudonym Manager
@@ -45,8 +45,8 @@ class ORCBot:
         self.validation_in_progress = dict()
         # The GPG validation requires a keyring and a key id, 
         # the two assignments under are the location in the filesystem.
-        self.keyring_location = keyring_loc
-        self.key_id = key_id
+        self.keyring_location = gpg_info[0]
+        self.key_id = gpg_info[1]
         # We need to be able ask the ServerConnectionDaemon for connects
         self.scd = scd
         # We keep a list of connections that have validated themselves
@@ -56,6 +56,10 @@ class ORCBot:
         # OrcBot needs to know if users are authorized to connect to servers 
         # and channels therefore it contains a banhandler.
         self.ban_han = ban_db
+                
+        self.server = server_info[0]
+        self.port = server_info[1]
+
         # Starts an instance of SingleServerIRCBot from the irclib project 
         # with OrcBot as its parent.
         self.irclibbot = IRCLibBot(self)
@@ -91,8 +95,10 @@ class ORCBot:
         # Actually write user input to file
         #TODO: Write files sequentially, and delete them afterwards
         input_file = "/tmp/"
-        for i in range(10):
+        count = 0
+        while (count < 10):
             input_file += random.choice(letters)
+            count = count + 1
         with open(input_file, 'w') as write_input:
             write_input.write(user_input)
     
@@ -106,7 +112,7 @@ class ORCBot:
         # Read the output from gnupg, and split it into an array so that it
         # can be evaluated.
         signature = clearsign.handles['stderr'].read()
-        s = signature.split()
+        splitted = signature.split()
     
         # The signature can not be checked if the public key is not found
         if "public key not found" in signature:
@@ -123,7 +129,7 @@ class ORCBot:
         # Accept a good signature if it is signed by the right key ID. If it
         # is a good signature, and the right key ID have been used, check
         # when the signature was made.
-        if "Good" in signature and keyid in s[14]:
+        if "Good" in signature and keyid in splitted[14]:
             con.privmsg(nick, "Validation succeded, good signature made.") 
             return True
             
@@ -265,27 +271,28 @@ class ORCBot:
                           "you may now connect.")
                 con.privmsg(nick, "For instructions type 'help connect'")
                 self.val_users.add_connection(self.scd.get_connection(nick), 
-                            self.create_md5(pseudonym))
+                            create_md5(pseudonym))
                 
             else:
                 con.privmsg(nick, "Validation failed, check that you are " + 
                           "using a valid pseudonym. Type 'help validate' " +
                           "for more information." )
                 
-    def create_md5(self, pseudonym):
-        '''
-        Create a md5 checksum from a string
-        '''
-        pseudonymasmd5 = md5(pseudonym)
-        return pseudonymasmd5.hexdigest()
+def create_md5(pseudonym):
+    '''
+    Create a md5 checksum from a string
+    '''
+    pseudonymasmd5 = md5(pseudonym)
+    return pseudonymasmd5.hexdigest()
     
 class IRCLibBot(SingleServerIRCBot):
     '''
     IRCLibBot from the irclib library.
     '''
-    def __init__(self, parent, nickname ="orcbot", server ="localhost", 
-                 port=6667):
+    def __init__(self, parent, nickname ="orcbot"):
         self.orc = parent
+        server = parent.server
+        port = parent.port
         
         SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
         self.start()
