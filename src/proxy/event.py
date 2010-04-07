@@ -5,9 +5,8 @@ import incomingconnections as incoming
 
 #holds the made up nicks that each connection has when talking
 #with orcbot
-orcbot_nicks = []
-#TODO: Replace index with hash of something, maybe timestamp
-
+socket_to_nick = {}
+nick_to_socket = {}
 """ Defines the Event class
 """
 class Event:
@@ -94,15 +93,13 @@ class Event:
         if(self.data[0]=="orcbot"):
             print "target is orcbot"
             self.target = self.orcbot
-            if(orcbot_nicks.count(self.source)==0):
-                orcbot_nicks.append(self.source)
-            self.message = ":" + str(orcbot_nicks.index(self.source)) + "!~@localhost " + self.message
+            self.message = ":" + socket_to_nick[self.source] + "!~@localhost " + self.message
 
         #TODO: The nicks for orcbot chats shouldnt be integers, and the lookup shouldnt
         #be an array access
         if(self.source == self.orcbot):
             print "source is orcbot"
-            self.target = orcbot_nicks[int(self.data[0])]
+            self.target = nick_to_socket[self.data[0]]
             self.message = ":orcbot!~@localhost "+self.message
         self.message = self.message +"\r\n"
         print "*******target**"
@@ -125,6 +122,10 @@ class Event:
     def pubmsg(self):
         """TODO
         """
+    def nick(self):
+        print "Assigning nick"
+        nick_to_socket[self.data[0]] = self.source
+        socket_to_nick[self.source] = self.data[0]
         
     def pubnotice(self):
         """TODO
