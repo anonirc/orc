@@ -292,7 +292,7 @@ class IRCLibBot(SingleServerIRCBot):
     def __init__(self, parent, nickname ="orcbot"):
         self.orc = parent
         server = parent.server
-        port = parent.port
+        port = int(parent.port)
         
         SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
         self.start()
