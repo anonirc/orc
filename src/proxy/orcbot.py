@@ -113,7 +113,6 @@ class ORCBot:
         # Read the output from gnupg, and split it into an array so that it
         # can be evaluated.
         signature = clearsign.handles['stderr'].read()
-        print signature
     
         # The signature can not be checked if the public key is not found
         if "public key not found" in signature:
@@ -159,6 +158,9 @@ class ORCBot:
             "received it, paste one line at a time." + " Ignore the blank " +
             "lines, we will fill them in for you." +
             " Complete the process by typing 'done' on a single line.")
+            con.privmsg(nick, "WARNING: after typing 'done' please allow " + 
+                        "atleast one minute before receiving validation results")
+            #Placeholder for pseudonym input
             self.validation_in_progress[nick] = ""
 
         elif (cmd[0:7] == "connect"):
@@ -180,8 +182,8 @@ class ORCBot:
                 server =  pieces[1] # Server
                 con.privmsg(nick, "You specified no port, defaulting to " + 
                 str(port) +
-                ". In moments you will be able to join a channel." +
-                " Type 'help join' for more information.")
+                ". In seconds you will be able to join a channel. Do so as " +
+                "you normally would.")
                 # Get the connection object from SCD and check if it is banned
                 serverban = self.ban_han.is_banned_from_server(
                                 self.val_users.get_pseudonym(nick), server)
@@ -205,8 +207,8 @@ class ORCBot:
                                             "this server.")
                     else:    
                         con.privmsg(nick, "Connecting you to " + server + 
-                        " at port " + port +  ". In a moment you will" + 
-                        "be able to join a channel.")
+                        " at port " + port +  ". In seconds you will" + 
+                        "be able to join a channel. Do so as you normally would.")
                         connect(nick, server, int(port))
                 else:
                     con.privmsg(nick, "Port cannot contain anything " +
