@@ -103,11 +103,12 @@ class Event:
         print "*******message to send"
         print self.message
         #TODO alter message to reflect hostmasks and such
-        try:
-            self.target[0].sendall(self.message)
-        except socket.error, err:
-            print "can't send"
-            print err
+        if(self.target[0]):
+            try:
+                self.target[0].sendall(self.message)
+            except socket.error, err:
+                print "can't send"
+                print err
         
             
 #     def privnotice(self):
