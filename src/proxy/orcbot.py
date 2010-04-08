@@ -17,6 +17,7 @@ import re
 
 from ircbot import SingleServerIRCBot
 from irclib import nm_to_n
+from event import connect
 
 import validated_users
 
@@ -179,36 +180,36 @@ class ORCBot:
                 con.privmsg(nick, "You supplied too few arguments (atleast"
                 + " one needed), type 'help connect' for more info.")
             elif(len(pieces) < 3):
-                server =  pieces[1] # Server
-                con.privmsg(nick, "You specified no port, defaulting to " + 
-                str(port) +
-                ". In moments you will be able to join a channel." +
-                " Type 'help join' for more information.")
-                # Get the connection object from SCD and check if it is banned
-                serverban = self.ban_han.is_banned_from_server(
-                self.scd.get_connection(nick), server)
-                if (serverban):
-                    con.privmsg(nick, "ERROR: You are banned from " +
-                    "this server.")
-                else:
+              #   server =  pieces[1] # Server
+#                 con.privmsg(nick, "You specified no port, defaulting to " + 
+#                 str(port) +
+#                 ". In moments you will be able to join a channel." +
+#                 " Type 'help join' for more information.")
+#                 # Get the connection object from SCD and check if it is banned
+#                 serverban = self.ban_han.is_banned_from_server(
+#                 self.scd.get_connection(nick), server)
+#                 if (serverban):
+#                     con.privmsg(nick, "ERROR: You are banned from " +
+#                     "this server.")
+#                 else:
                     # Asks ServerConnectionDaemon to connect this user to
                     # the specified server
-                    self.scd.connect_to_server(nick, server, port)
+                connect(nick, server, port)
 
             elif(len(pieces[2]) > 1):
                 server =  pieces[1] # Server
                 port =  pieces[2]
                 if(re.match("[0-9]+", port)):
-                    serverban = self.ban_han.is_banned_from_server(
-                    self.val_users[self.scd.get_connection(nick)], server)
-                    if (serverban):
-                        con.privmsg(nick, "ERROR: You are banned from " +
-                        "this server.")
-                    else:
-                        con.privmsg(nick, "Connecting you to " + server + 
+                  #   serverban = self.ban_han.is_banned_from_server(
+#                     self.val_users[self.scd.get_connection(nick)], server)
+#                     if (serverban):
+#                         con.privmsg(nick, "ERROR: You are banned from " +
+#                         "this server.")
+#                     else:
+                    con.privmsg(nick, "Connecting you to " + server + 
                         " at port " + port +  ". In a moment you will" + 
                         "be able to join a channel.")
-                        self.scd.connect_to_server(nick, server, port)
+                    connect(nick, server, int(port))
                 else:
                     con.privmsg(nick, "Port cannot contain anything " +
                     "but numbers. Try again. For help type 'help connect'")

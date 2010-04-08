@@ -28,10 +28,12 @@ class ServerConnectionDaemon(threading.Thread):
             time.sleep(1)
             #goes through connections and calls ircParse's
             #on them, returning an Event object, or None            
-            events = map(lambda x:parse.process_data(x), CONNECTIONS.items())
-            events = filter(lambda x:x!=None, events)
-            for e in events:
-                e.printC()
+            event_list = map(lambda x:parse.process_data(x, None), CONNECTIONS.items())
+            event_list = filter(lambda x:x!=None, event_list)
+            for events in event_list:
+                for event in events:
+                    event.apply_handler()
+
 
 def connect_to_server(nick, connection, server_address,
                           password=None, port=6667):
@@ -48,7 +50,8 @@ def connect_to_server(nick, connection, server_address,
     #TODO Error checking/exception handling
     tmp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     tmp.connect((server_address, port))
-    
+    tmp.settimeout(.5)
+    tmp = (tmp, server_address)
     CONNECTIONS[tmp] = connection
     return tmp
 

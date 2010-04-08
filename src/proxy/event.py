@@ -32,12 +32,10 @@ class Event:
         print "handlin'"
         tmp = self.event_type
         if hasattr(self, tmp):
-            #if message is for orcbot, set orcbot as target
-            if(self.data[0]=="orcbot"):
-                print "target = orcbot"
-                self.target = self.orcbot
-            
             getattr(self, tmp)()
+        elif(self.target):
+            self.message = self.message +"\r\n"
+            self.target[0].send(self.message)
 
     def get_type(self):
         """ Gets the type of an event"""
@@ -59,28 +57,28 @@ class Event:
         """print function, used for debugging/testing"""
         print(self.event_type)
 
-    def error(self):
-        """TODO:
-        """
+   #  def error(self):
+#         """TODO:
+#         """
         
-    def join(self):
-        """TODO:
-        """
+#     def join(self):
+#         """TODO:
+#         """
                          
-    def kick(self):
-        """TODO
-        """
-    def mode(self):
-        """TODO
-        """
+#     def kick(self):
+#         """TODO
+#         """
+#     def mode(self):
+#         """TODO
+#         """
         
-    def part(self):
-        """TODO
-        """
+#     def part(self):
+#         """TODO
+#         """
         
-    def ping(self):
-        """TODO
-        """
+#     def ping(self):
+#         """TODO
+#         """
         
     def privmsg(self):
         """ Handles privmsg event
@@ -112,31 +110,36 @@ class Event:
             print err
         
             
-    def privnotice(self):
-        """TODO
-        """
+#     def privnotice(self):
+#         """TODO
+#         """
         
-    def pubmsg(self):
-        """TODO
-        """
+#     def pubmsg(self):
+#         """TODO
+#         """
     def nick(self):
         print "Assigning nick"
-        nick_to_socket[self.data[0]] = self.source
-        socket_to_nick[self.source] = self.data[0]
+        if(not socket_to_nick.has_key(self.source)):
+            nick_to_socket[self.data[0]] = self.source
+            socket_to_nick[self.source] = self.data[0]
+        else:
+            self.message = self.message +"\r\n"
+            self.target[0].send(self.message)
         
-    def pubnotice(self):
-        """TODO
-        """
-    def quit(self):
-        """TODO
-        """
+        
+#     def pubnotice(self):
+#         """TODO
+#         """
+#     def quit(self):
+#         """TODO
+#         """
 
-    def invite(self):
-        """TODO
-        """
-    def pong(self):
-        """TODO
-        """
+#     def invite(self):
+#         """TODO
+#         """
+#     def pong(self):
+#         """TODO
+#         """
 def connect(nick, server_address = "irc.oftc.net",
             port = 6667, password = None):
     incoming.add_target(nick_to_socket[nick],
