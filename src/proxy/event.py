@@ -117,6 +117,7 @@ class Event:
 #     def pubmsg(self):
 #         """TODO
 #         """
+
     def nick(self):
         print "Assigning nick"
         if(not socket_to_nick.has_key(self.source)):
@@ -142,8 +143,13 @@ class Event:
 #         """
 def connect(nick, server_address = "irc.oftc.net",
             port = 6667, password = None):
-    incoming.add_target(nick_to_socket[nick],
-                        server.connect_to_server(
-                            nick, nick_to_socket[nick],
-                            server_address, password, port))
-
+    user_connection = nick_to_socket[nick]
+    server_connection = server.connect_to_server( nick,
+                                                  nick_to_socket[nick],
+                                                  server_address,
+                                                  password,
+                                                  port)
+    
+    incoming.add_target(user_connection, server_connection)
+    server_connection[0].send("NICK " + nick + "\r\n")
+    server_connection[0].send("USER " + nick + " orc orc :orc \r\n")
