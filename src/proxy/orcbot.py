@@ -66,8 +66,10 @@ class ORCBot:
         
     def validate_pseudonym(self, user_input, nick, con):
         '''
-        Takes the argument pseudonym and performs validation on the 
-        pseudonym against the cert.
+        Based on code by Runa Sandvik and rewritten for IRC use.
+        
+        Takes the argument pseudonym and performs gpg verication on the 
+        pseudonym against the keyring.
         '''
           
         # Define GnuPGInterface
@@ -111,7 +113,7 @@ class ORCBot:
         # Read the output from gnupg, and split it into an array so that it
         # can be evaluated.
         signature = clearsign.handles['stderr'].read()
-        splitted = signature.split()
+        print signature
     
         # The signature can not be checked if the public key is not found
         if "public key not found" in signature:
@@ -128,7 +130,7 @@ class ORCBot:
         # Accept a good signature if it is signed by the right key ID. If it
         # is a good signature, and the right key ID have been used, check
         # when the signature was made.
-        if "Good" in signature and keyid in splitted[14]:
+        if "Good" in signature and keyid in signature:
             con.privmsg(nick, "Validation succeded, good signature made.") 
             return True
             
@@ -182,7 +184,7 @@ class ORCBot:
                 " Type 'help join' for more information.")
                 # Get the connection object from SCD and check if it is banned
                 serverban = self.ban_han.is_banned_from_server(
-                self.scd.get_connection(nick), server)
+                                self.val_users.get_pseudonym(nick), server)
                 if (serverban):
                     con.privmsg(nick, "ERROR: You are banned from " +
                                     "this server.")
@@ -196,7 +198,7 @@ class ORCBot:
                 port =  pieces[2]
                 if(re.match("[0-9]+", port)):
                     serverban = self.ban_han.is_banned_from_server(
-                    self.val_users[self.scd.get_connection(nick)], server)
+                                self.val_users.get_pseudonym(nick), server)
                     if (serverban):
                         
                         con.privmsg(nick, "ERROR: You are banned from " +
@@ -244,7 +246,7 @@ class ORCBot:
             con.privmsg(nick, "Example: 'connect irc.oftc.net 6667'")
             
         else:
-            con.notice(nick, "You wrote: '" + cmd + "' this is not a " + 
+            con.privmsg(nick, "You wrote: '" + cmd + "' this is not a " + 
                      "recognized command, try typing 'help'")
         
     def enter_pseudonym(self, nick, cmd, con):

@@ -57,9 +57,13 @@ BH = banhandler.BanHandler(CONFIG.get('ORC', 'bh_host'),
                            CONFIG.get('ORC', 'BH_db'))
 
 print "starting bot"
-BOT = orcbot.ORCBot((CONFIG.get('ORC', 'orcbot_server'),
+BOT = orcbot.ORCBot(#Server
+                    (CONFIG.get('ORC', 'orcbot_server'),
                     (CONFIG.get('ORC', 'orcbot_port'))),
+                    # GPG
                     (CONFIG.get('ORC', 'orcbot_keyring'), 
-                    CONFIG.get('ORC', 'orcbot_keyid')), 
+                    CONFIG.get('ORC', 'orcbot_keyid')),
+                    # Banhandler and URI of PM 
                     BH, 
-                    CONFIG.get('ORC', 'orcbot_pmname'))
+                    CONFIG.get('ORC', 'orcbot_pmname')
+                                                        )

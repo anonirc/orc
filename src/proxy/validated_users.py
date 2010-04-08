@@ -19,6 +19,9 @@ class ValidatedUsers():
         if(self.dict_nick_to_pseudonym.has_key(nick)):
             return True
         return False
+    
+    def get_pseudonym(self, nick):
+        return self.dict_nick_to_pseudonym.get(nick)
         
     '''
     '''
