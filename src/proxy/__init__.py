@@ -62,5 +62,4 @@ BOT = orcbot.ORCBot((CONFIG.get('ORC', 'orcbot_server'),
                     (CONFIG.get('ORC', 'orcbot_keyring'), 
                     CONFIG.get('ORC', 'orcbot_keyid')), 
                     BH, 
-                    SENDER, 
                     CONFIG.get('ORC', 'orcbot_pmname'))

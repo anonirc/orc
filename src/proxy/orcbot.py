@@ -31,7 +31,7 @@ class ORCBot:
     Code used includes all references to ircbot or irclib.
     '''
     #TODO: Handle exceptions throughout the class?
-    def __init__(self, server_info, gpg_info, ban_db, scd, pm_name):
+    def __init__(self, server_info, gpg_info, ban_db, pm_name):
         '''
         Initializes the OrcBot object.
         Takes arguments: 
@@ -48,8 +48,6 @@ class ORCBot:
         # the two assignments under are the location in the filesystem.
         self.keyring_location = gpg_info[0]
         self.key_id = gpg_info[1]
-        # We need to be able ask the ServerConnectionDaemon for connects
-        self.scd = scd
         # We keep a list of connections that have validated themselves
         self.val_users = validated_users.ValidatedUsers()
         # To tell the iusers of orcbot where they can aquire a pseuodonym
@@ -162,14 +160,11 @@ class ORCBot:
             self.validation_in_progress[nick] = ""
 
         elif (cmd[0:7] == "connect"):
-            # TODO: Activate this method once test enviroment is running
-            # For now, validation checking is diabled
-            #
-            #if(not self.val_users.haskey(nick):
-            #    con.privmsg(nick, "You are not validated and may not " +
-            #    "connect. Type 'help validate' for instructions."
-            #    return
-            #
+            #if(not self.val_users.haskey(nick)):
+            if(not self.val_users.is_validated(nick)):
+                con.privmsg(nick, "You are not validated and may not " +
+                            "connect. Type 'help validate' for instructions.")
+                return
             # This regexp returns a string array of word, which it parses by
             # seperating them by whitespace.
             pieces = [p for p in re.split("( |\\\".*?\\\"|'.*?')", cmd) if
@@ -179,37 +174,38 @@ class ORCBot:
             if(len(pieces) < 2):
                 con.privmsg(nick, "You supplied too few arguments (atleast"
                 + " one needed), type 'help connect' for more info.")
-            elif(len(pieces) < 3):
-              #   server =  pieces[1] # Server
-#                 con.privmsg(nick, "You specified no port, defaulting to " + 
-#                 str(port) +
-#                 ". In moments you will be able to join a channel." +
-#                 " Type 'help join' for more information.")
-#                 # Get the connection object from SCD and check if it is banned
-#                 serverban = self.ban_han.is_banned_from_server(
-#                 self.scd.get_connection(nick), server)
-#                 if (serverban):
-#                     con.privmsg(nick, "ERROR: You are banned from " +
-#                     "this server.")
-#                 else:
-                    # Asks ServerConnectionDaemon to connect this user to
-                    # the specified server
-                connect(nick, server, port)
-
+            elif(len(pieces) < 3): 
+                server =  pieces[1] # Server
+                con.privmsg(nick, "You specified no port, defaulting to " + 
+                str(port) +
+                ". In moments you will be able to join a channel." +
+                " Type 'help join' for more information.")
+                # Get the connection object from SCD and check if it is banned
+                serverban = self.ban_han.is_banned_from_server(
+                self.scd.get_connection(nick), server)
+                if (serverban):
+                    con.privmsg(nick, "ERROR: You are banned from " +
+                                    "this server.")
+                else:
+                    # Creates a connection Event
+                    connect(nick, server, port)
+                    
             elif(len(pieces[2]) > 1):
+                # This triggers if the user has supplied two arguments
                 server =  pieces[1] # Server
                 port =  pieces[2]
                 if(re.match("[0-9]+", port)):
-                  #   serverban = self.ban_han.is_banned_from_server(
-#                     self.val_users[self.scd.get_connection(nick)], server)
-#                     if (serverban):
-#                         con.privmsg(nick, "ERROR: You are banned from " +
-#                         "this server.")
-#                     else:
-                    con.privmsg(nick, "Connecting you to " + server + 
+                    serverban = self.ban_han.is_banned_from_server(
+                    self.val_users[self.scd.get_connection(nick)], server)
+                    if (serverban):
+                        
+                        con.privmsg(nick, "ERROR: You are banned from " +
+                                            "this server.")
+                    else:    
+                        con.privmsg(nick, "Connecting you to " + server + 
                         " at port " + port +  ". In a moment you will" + 
                         "be able to join a channel.")
-                    connect(nick, server, int(port))
+                        connect(nick, server, int(port))
                 else:
                     con.privmsg(nick, "Port cannot contain anything " +
                     "but numbers. Try again. For help type 'help connect'")
@@ -226,7 +222,7 @@ class ORCBot:
             con.privmsg(nick, "connect  - Connect to an IRC server. " + 
                       "requires validation.")
             #con.privmsg(nick, "join     - Join a channel. requires " + 
-                      #"validation and a active server connection.")
+            #"validation and a active server connection.")
             con.privmsg(nick, "Type 'help <commandname>' to get more info" + 
                       "about each command.")
             
@@ -256,7 +252,7 @@ class ORCBot:
         This function is called as long as the user is in the validation 
         dictionary and havent finished their validation.
         '''
-        if(cmd!="done"):
+        if(cmd != "done"):
             self.validation_in_progress[nick] += cmd + "\n"
             if(("Version" in cmd) or ("Hash" in cmd)):
                 self.validation_in_progress[nick] += "\n"
@@ -270,8 +266,7 @@ class ORCBot:
                 con.privmsg(nick, "Validation performed successfully, " + 
                           "you may now connect.")
                 con.privmsg(nick, "For instructions type 'help connect'")
-                self.val_users.add_connection(self.scd.get_connection(nick), 
-                            create_md5(pseudonym))
+                self.val_users.add(nick, create_md5(pseudonym))
                 
             else:
                 con.privmsg(nick, "Validation failed, check that you are " + 

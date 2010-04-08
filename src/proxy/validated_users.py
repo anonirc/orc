@@ -6,13 +6,19 @@ class ValidatedUsers():
     def __init__(self):
         #TODO work out communication by depending classes
         #TODO: Handle exceptions?
-        self.dictionary = dict()
+        self.dict_nick_to_pseudonym = dict()
         
-    def add_connection(self, connection, pseudonym):
-        self.dictionary[connection] = pseudonym
+    def add(self, nick, pseudonym):
+        self.dict_nick_to_pseudonym[nick] = pseudonym
 
-    def remove_connection(self, connection):
-        del self.dictionary[connection]
+    #def remove_connection(self, connection):
+    #    del self.dict_nick_to_pseudonym[connection]
+    # TODO: event should be able to do this
+        
+    def is_validated(self, nick):
+        if(self.dict_nick_to_pseudonym.has_key(nick)):
+            return True
+        return False
         
     '''
     '''
