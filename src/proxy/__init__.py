@@ -29,8 +29,8 @@ if("root" in OUTPUT):
 elif("www-data" in OUTPUT):
     TESTUSER = False
 if(TESTUSER):
-    print ("Unknown user, make sure you have the correct permissions for GPG" + 
-    " validation")
+    print ("Script run as " + str(OUTPUT) + ", make sure you have the " +
+           "correct permissions for GPG keyring specified in orc.conf.")
 # If another user then root or www-data is running, we assume it's for
 # testing purposes and the resources the script requires reside on the
 # user's home directory
