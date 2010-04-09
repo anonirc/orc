@@ -1,6 +1,5 @@
 #! /usr/bin/env python
 # coding=UTF-8
-
 '''
 Created on 9. mars 2010
 
@@ -45,23 +44,19 @@ class ORCBot:
         # the user is in a validation process.
         self.validation_in_progress = dict()
         # The GPG validation requires a keyring and a key id, 
-        # the two assignments under are the location in the filesystem.
-        self.keyring_location = gpg_info[0]
-        self.key_id = gpg_info[1]
+        # the argument under is a tuple of location and keyid
+        self.gpg_info = gpg_info
         # We keep a list of connections that have validated themselves
         self.val_users = validated_users.ValidatedUsers()
-        # To tell the iusers of orcbot where they can aquire a pseuodonym
+        # To tell the users of orcbot where they can aquire a pseuodonym
         self.pm_name = pm_name
         # OrcBot needs to know if users are authorized to connect to servers 
         # and channels therefore it contains a banhandler.
         self.ban_han = ban_db
                 
-        self.server = server_info[0]
-        self.port = server_info[1]
-
         # Starts an instance of SingleServerIRCBot from the irclib project 
         # with OrcBot as its parent.
-        self.irclibbot = IRCLibBot(self)
+        self.irclibbot = IRCLibBot(self, server_info)
 
         
     def validate_pseudonym(self, user_input, nick, con):
@@ -79,10 +74,10 @@ class ORCBot:
         
         # Tell gnupg where to find the GPG keyring. That is, the .gnupg
         # directory. Do not add the trailing slash.
-        gnupg.options.homedir = self.keyring_location
+        gnupg.options.homedir = self.gpg_info[0]
         
         # The ID of the key that was used to sign the user input.
-        keyid = self.key_id
+        keyid = self.gpg_info[1]
         ### End config ###
         
         ### Verify signature of user input using GPG 
@@ -165,7 +160,7 @@ class ORCBot:
             "lines, we will fill them in for you." +
             " Complete the process by typing 'done' on a single line.")
             con.privmsg(nick, "WARNING: after typing 'done' please allow " + 
-                        "atleast one minute before receiving validation results")
+                    "atleast one minute before receiving validation results")
             #Placeholder for pseudonym input
             self.validation_in_progress[nick] = ""
 
@@ -213,8 +208,8 @@ class ORCBot:
                                             "this server.")
                     else:    
                         con.privmsg(nick, "Connecting you to " + server + 
-                        " at port " + port +  ". In seconds you will" + 
-                        "be able to join a channel. Do so as you normally would.")
+                        " at port " + port +  ". In seconds you will be able" + 
+                        "to join a channel. Do so as you normally would.")
                         connect(nick, server, int(port))
                 else:
                     con.privmsg(nick, "Port cannot contain anything " +
@@ -294,10 +289,11 @@ class IRCLibBot(SingleServerIRCBot):
     '''
     IRCLibBot from the irclib library.
     '''
-    def __init__(self, parent, nickname ="orcbot"):
+    def __init__(self, parent, server_info, nickname ="orcbot"):
+                        
+        server = server_info[0]
+        port = int(server_info[1])
         self.orc = parent
-        server = parent.server
-        port = int(parent.port)
         
         SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
         self.start()
