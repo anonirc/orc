@@ -113,8 +113,9 @@ class ORCBot:
         # Read the output from gnupg, and split it into an array so that it
         # can be evaluated.
         signature = clearsign.handles['stderr'].read()
-        #TODO: Remove debug
-        con.privmsg(nick, signature)
+        # For debugging
+        # con.privmsg(nick, signature)
+        # print signature
     
         # The signature can not be checked if the public key is not found
         if "public key not found" in signature:
@@ -267,7 +268,7 @@ class ORCBot:
                 self.validation_in_progress[nick] += "\n"
         else:
             pseudonym = self.validation_in_progress.get(nick)
-            con.privmsg(nick, "Your certificate was retrieved, validating..")
+            con.privmsg(nick, "Your pseudonym was retrieved, validating..")
             validation_result = self.validate_pseudonym(pseudonym, nick, con)
             # Remove nick from the validation process list
             del self.validation_in_progress[nick]
