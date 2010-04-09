@@ -113,6 +113,8 @@ class ORCBot:
         # Read the output from gnupg, and split it into an array so that it
         # can be evaluated.
         signature = clearsign.handles['stderr'].read()
+        #TODO: Remove debug
+        con.privmsg(nick, signature)
     
         # The signature can not be checked if the public key is not found
         if "public key not found" in signature:
@@ -129,9 +131,12 @@ class ORCBot:
         # Accept a good signature if it is signed by the right key ID. If it
         # is a good signature, and the right key ID have been used, check
         # when the signature was made.
-        if "Good" in signature and keyid in signature:
-            con.privmsg(nick, "Validation succeded, good signature made.") 
-            return True
+        if ("Good" in signature):
+            if (keyid in signature):    
+                con.privmsg(nick, "Validation succeded, good signature made.") 
+                return True
+            else:
+                con.privmsg(nick, "Validation failed, wrong key id.") 
             
         # If no if sentences has kicked in, system is broken
         con.privmsg(nick, "Validation reached end of function. " + 
