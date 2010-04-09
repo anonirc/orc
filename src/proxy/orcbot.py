@@ -257,7 +257,7 @@ class ORCBot:
         This function is called as long as the user is in the validation 
         dictionary and havent finished their validation.
         '''
-        if(cmd != "done"):
+        if(cmd!="done"):
             self.validation_in_progress[nick] += cmd + "\n"
             if(("Version" in cmd) or ("Hash" in cmd)):
                 self.validation_in_progress[nick] += "\n"
@@ -277,6 +277,8 @@ class ORCBot:
                 con.privmsg(nick, "Validation failed, check that you are " + 
                           "using a valid pseudonym. Type 'help validate' " +
                           "for more information." )
+    def start(self):
+        self.irclibbot.start()
                 
 def create_md5(pseudonym):
     '''
@@ -296,7 +298,6 @@ class IRCLibBot(SingleServerIRCBot):
         self.orc = parent
         
         SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
-        self.start()
 
     #TODO: Add DCC support 
     def on_privmsg(self, con, eee):

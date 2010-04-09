@@ -18,22 +18,12 @@ import serverconnectiondaemon as outgoing
 # Check what user has initiated the script
 PROCESS = os.popen("whoami")
 OUTPUT = PROCESS.read()
-TESTUSER = True
+
 if("root" in OUTPUT):
-    print "We do not need root permissions, running the script as www-data."
+    print "root permissions not needed, running as www-data."
     # On the test system, the uid of www-data is 33 (and on most Debian
-    # systems. In a prod enviroment, we would likely run the PM
-    # as www-data and the proxy as another user.
+    # systems. 
     os.setuid(33)
-    TESTUSER = False
-elif("www-data" in OUTPUT):
-    TESTUSER = False
-if(TESTUSER):
-    print ("Script run as " + str(OUTPUT) + ", make sure you have the " +
-           "correct permissions for GPG keyring specified in orc.conf.")
-# If another user then root or www-data is running, we assume it's for
-# testing purposes and the resources the script requires reside on the
-# user's home directory
 
 #Reading the CONFIG from file
 CONFIG = ConfigParser.RawConfigParser()
@@ -63,7 +53,8 @@ BOT = orcbot.ORCBot(#Server
                     # GPG
                     (CONFIG.get('ORC', 'orcbot_keyring'), 
                     CONFIG.get('ORC', 'orcbot_keyid')),
-                    # Banhandler and URI of PM 
+                    # BanHandler and URI of PM 
                     BH, 
                     CONFIG.get('ORC', 'orcbot_pmname')
                                                         )
+BOT.start()
