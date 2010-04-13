@@ -103,7 +103,7 @@ class Event:
         print "*******message to send"
         print self.message
         #TODO alter message to reflect hostmasks and such
-        if(self.target[0]):
+        if(self.target):
             try:
                 self.target[0].sendall(self.message)
             except socket.error, err:
@@ -122,8 +122,12 @@ class Event:
     def nick(self):
         print "Assigning nick"
         if(not socket_to_nick.has_key(self.source)):
-            nick_to_socket[self.data[0]] = self.source
-            socket_to_nick[self.source] = self.data[0]
+            if(not nick_to_socket.has_key(self.data[0])):
+                nick_to_socket[self.data[0]] = self.source
+                socket_to_nick[self.source] = self.data[0]
+            else:
+                msg = ":orc.onion 433 * "+self.data[0]+" :Nickname is already in use.\r\n"
+                self.source[0].send(msg)
         else:
             self.message = self.message +"\r\n"
             self.target[0].send(self.message)
