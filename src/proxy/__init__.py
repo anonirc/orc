@@ -25,7 +25,7 @@ if("root" in OUTPUT):
     # systems. 
     os.setuid(33)
 
-# Reading the CONFIG from file
+# Reading the config from file
 CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('orc.conf')
 
@@ -47,7 +47,7 @@ BH = banhandler.BanHandler(CONFIG.get('ORC', 'bh_host'),
                            CONFIG.get('ORC', 'BH_db'))
 
 print "starting bot"
-BOT = orcbot.ORCBot(#Server
+BOT = orcbot.ORCBot(# Server info
                     (CONFIG.get('ORC', 'orcbot_server'),
                     (CONFIG.get('ORC', 'orcbot_port'))),
                     # GPG

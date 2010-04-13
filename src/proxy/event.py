@@ -57,7 +57,7 @@ class Event:
         """print function, used for debugging/testing"""
         print(self.event_type)
 
-   #  def error(self):
+#  def error(self):
 #         """TODO:
 #         """
         
@@ -76,9 +76,20 @@ class Event:
 #         """TODO
 #         """
         
-#     def ping(self):
-#         """TODO
-#         """
+    def ping(self):
+        ''' 
+        If irssi or other client tries to ping ORC while
+        the user is not connected, return a pong.
+        Else some clients disconnect.
+        '''
+        # If it's the ORC proxy being pinged, return a pong.
+        if(self.data[0] == "ORC"):
+            self.message = "PONG " + self.data[0] + "\r\n"
+            self.source[0].send(self.message)
+        # If user connected to another IRC server, forward the ping.
+        elif(self.target):
+            self.target[0].send(self.message + "\r\n")
+        
         
     def privmsg(self):
         """ Handles privmsg event
@@ -96,8 +107,8 @@ class Event:
         if(self.source == self.orcbot):
             print "source is orcbot"
             self.target = nick_to_socket[self.data[0]]
-            self.message = ":orcbot!~@localhost "+self.message
-        self.message = self.message +"\r\n"
+            self.message = ":orcbot!~@localhost " + self.message
+        self.message = self.message + "\r\n"
         print "*******target**"
         print self.target
         print "*******message to send"
