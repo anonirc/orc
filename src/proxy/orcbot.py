@@ -278,6 +278,9 @@ class ORCBot:
                           "using a valid pseudonym. Type 'help validate' " +
                           "for more information." )
     def start(self):
+        '''
+        Runs this ORCBot instance.
+        '''
         self.irclibbot.start()
                 
 def create_md5(pseudonym):

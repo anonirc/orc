@@ -3,9 +3,9 @@ Created on 22. March 2010
 
 @author: Harald Hauknes
 
-The purpose of this script is to set up and CONFIGure
+The purpose of this script is to set up and configure
 the test enviroment of the proxy.
-All global variables will be CONFIGured from here.
+All global variables and instances will be configured from here.
 '''
 import os
 import ConfigParser
@@ -25,12 +25,12 @@ if("root" in OUTPUT):
     # systems. 
     os.setuid(33)
 
-#Reading the CONFIG from file
+# Reading the CONFIG from file
 CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('orc.conf')
 
-#should set up sender and RECEIVER threads
-print "starting RECEIVER"
+# Sets up sender and reciever threads
+print "starting receiver"
 RECEIVER = incoming.IncomingConnectionDaemon()
 RECEIVER.init(CONFIG.get('ORC', 'icd_host'), 
               int(CONFIG.get('ORC', 'icd_port')))
