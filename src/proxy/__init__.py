@@ -32,7 +32,7 @@ CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('orc.conf')
 
 # Sets up sender and reciever threads
-print "starting receiver"
+print "Starting receiver.."
 try:
     RECEIVER = incoming.IncomingConnectionDaemon()
     RECEIVER.init(CONFIG.get('ORC', 'icd_host'), 
@@ -41,13 +41,17 @@ except ValueError:
     print ("ERROR: Accessing the options for the receiver failed, " +
            "please review your orc.conf file.")
     sys.exit(1)
+except ConfigParser.NoSectionError:
+    print ("ERROR: Section [ORC] not found or file does not exist, " +
+    "please review your orc.conf file.")
+    sys.exit(1)
 RECEIVER.start()
 
-print "starting sender"
+print "Starting sender.."
 SENDER = outgoing.ServerConnectionDaemon()
 SENDER.start()
 
-print "starting banhandler"
+print "Starting banhandler.."
 try:
     BH = banhandler.BanHandler(CONFIG.get('ORC', 'bh_host'),
                                CONFIG.get('ORC', 'bh_user'), 
@@ -62,7 +66,7 @@ except _mysql_exceptions.OperationalError:
            "please review your orc.conf file.")
     sys.exit(1)
     
-print "starting bot"
+print "Starting bot.."
 try:
     BOT = orcbot.ORCBot(# Server info
                         (CONFIG.get('ORC', 'orcbot_server'),
