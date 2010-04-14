@@ -1,20 +1,18 @@
-import string
 import socket
 import serverconnectiondaemon as server
 import incomingconnections as incoming
 
-#holds the made up nicks that each connection has when talking
-#with orcbot
-socket_to_nick = {}
-nick_to_socket = {}
-""" Defines the Event class
-"""
+# Holds the made up nicks that each connection has when talking
+# with ORCBot
+SOCKET_TO_NICK = {}
+NICK_TO_SOCKET = {}
+""" Defines the Event class """
 class Event:
-    """Holds the type and handler function for irc events
-    """
+    """ Holds the type and handler function for irc events """
 
     def __init__(self, event_type, source, target, orcbot, raw, data=None):
-        """Holds an event with event type, source, target,
+        """
+        Holds an event with event type, source, target,
         and optionally data needed for the event
         """
         self.event_type = event_type
@@ -26,9 +24,7 @@ class Event:
         self.orcbot = orcbot  
 
     def apply_handler(self):
-        """the code that calls the event handler for the event
-        type
-        """
+        """ The code that calls the event handler for the event type """
         print "handlin'"
         tmp = self.event_type
         if hasattr(self, tmp):
@@ -102,11 +98,12 @@ class Event:
         if(self.data[0]=="orcbot"):
             print "target is orcbot"
             self.target = self.orcbot
-            self.message = ":" + socket_to_nick[self.source] + "!~@localhost " + self.message
+            self.message = ":" + SOCKET_TO_NICK[self.source] + "!~@localhost " 
+            + self.message
 
         if(self.source == self.orcbot):
             print "source is orcbot"
-            self.target = nick_to_socket[self.data[0]]
+            self.target = NICK_TO_SOCKET[self.data[0]]
             self.message = ":orcbot!~@localhost " + self.message
         self.message = self.message + "\r\n"
         print "*******target**"
@@ -132,18 +129,18 @@ class Event:
 
     def nick(self):
         print "Assigning nick"
-        if(not socket_to_nick.has_key(self.source)):
-            if(not nick_to_socket.has_key(self.data[0])):
-                nick_to_socket[self.data[0]] = self.source
-                socket_to_nick[self.source] = self.data[0]
+        if(not SOCKET_TO_NICK.has_key(self.source)):
+            if(not NICK_TO_SOCKET.has_key(self.data[0])):
+                NICK_TO_SOCKET[self.data[0]] = self.source
+                SOCKET_TO_NICK[self.source] = self.data[0]
             else:
-                msg = ":orc.onion 433 * "+self.data[0]+" :Nickname is already in use.\r\n"
+                msg = ":orc.onion 433 * " + self.data[0] + \
+                " :Nickname is already in use.\r\n"
                 self.source[0].send(msg)
         else:
             self.message = self.message +"\r\n"
             self.target[0].send(self.message)
-        
-        
+           
 #     def pubnotice(self):
 #         """TODO
 #         """
@@ -159,9 +156,10 @@ class Event:
 #         """
 def connect(nick, server_address = "irc.oftc.net",
             port = 6667, password = None):
-    user_connection = nick_to_socket[nick]
+    ''' Connects a user to a IRC server '''
+    user_connection = NICK_TO_SOCKET[nick]
     server_connection = server.connect_to_server( nick,
-                                                  nick_to_socket[nick],
+                                                  NICK_TO_SOCKET[nick],
                                                   server_address,
                                                   password,
                                                   port)
