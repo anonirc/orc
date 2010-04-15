@@ -9,6 +9,9 @@ import ircparse as parse
 
 CONNECTIONS = {}
 
+IDENT_CONNECTIONS = []
+IDENT_RESPONSES = {}
+
 class ServerConnectionDaemon(threading.Thread):
     """Opens connections to servers and polls for events
     on the socket object
@@ -51,14 +54,39 @@ def connect_to_server(nick, connection, server_address,
     tmp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     tmp.connect((server_address, port))
     tmp.settimeout(.5)
+    IDENT_RESPONSES[(tmp.getsockname()[1], port)] = "identOCTETstring"
     tmp = (tmp, server_address)
     CONNECTIONS[tmp] = connection
     return tmp
 
-def get_connection(self, nick):
-    '''
-    Return the connection object so that ORCBot can store it in it's validated
-    user dictionary.
-    '''
-    #TODO: Write this function
-    return "aConnectionObject"
+def acceptIdentConnections():
+    """ Accepts connections to 113 for ident responses
+    """
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind(("localhost", 113))
+    sock.listen(10)
+    while 1:
+        try:
+            tmp = sock.accept()
+            tmp[0].settimeout(.5)
+            IDENT_CONNECTIONS.append(tmp)
+        finally:
+            time.sleep(1)
+            
+def respondToIdents():
+    """ Listens to the IDENT_CONNECTIONS, and responds
+    to ident requests
+    """
+    if(IDENT_CONNECTIONS):
+        data = map(_receiveOrNone, IDENT_CONNECTIONS)
+        data = filter(lambda x:x!=None, data)
+        for d in data:
+            d[0].strip().split(",")
+            if(IDENT_RESPONSES.has_key((int(d[0][0]),int(d[0][1])))):
+                d[1][0].send(d[0][0]+d[0][1]+" :USERID:UNIIX:"+IDENT_RESPONSES[(int(d[0][0]),int(d[0][1]))]+"\r\n")
+def _receiveOrNone(sock):
+    try:
+        tmp = (sock[0].recv(2**14), sock)
+        return tmp
+    except socket.error, err:
+        return None
