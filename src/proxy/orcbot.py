@@ -202,8 +202,7 @@ class ORCBot:
                 if(re.match("[0-9]+", port)):
                     serverban = self.ban_han.is_banned_from_server(
                                 self.val_users.get_pseudonym(nick), server)
-                    if (serverban):
-                        
+                    if (serverban):                        
                         con.privmsg(nick, "ERROR: You are banned from " +
                                             "this server.")
                     else:    

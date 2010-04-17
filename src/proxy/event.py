@@ -83,7 +83,6 @@ class Event:
             print "target is orcbot"
             self.target = self.orcbot
             self.message = ":" + SOCKET_TO_NICK[self.source] + "!~@localhost "+ self.message
-
         if(self.source == self.orcbot):
             print "source is orcbot"
             self.target = NICK_TO_SOCKET[self.data[0]]
@@ -114,7 +113,7 @@ class Event:
 
 def connect(nick, server_address = "irc.oftc.net",
             port = 6667, password = None):
-    ''' Connects a user to a IRC server '''
+    ''' Connects a user to an IRC server '''
     user_connection = NICK_TO_SOCKET[nick]
     server_connection = server.connect_to_server( nick,
                                                   NICK_TO_SOCKET[nick],
