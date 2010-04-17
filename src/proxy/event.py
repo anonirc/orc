@@ -1,4 +1,5 @@
 import socket
+import random
 import serverconnectiondaemon as server
 import incomingconnections as incoming
 
@@ -6,6 +7,8 @@ import incomingconnections as incoming
 # with ORCBot
 SOCKET_TO_NICK = {}
 NICK_TO_SOCKET = {}
+ALPHABET = "abcdefghijklmnopqrstuvwxABCDEFGHIJKLMNOPQRSTUVWX"
+NICK_LENGTH = 8
 
 class Event:
     """ Holds the type and handler function for irc events """
@@ -100,13 +103,11 @@ class Event:
     def nick(self):
         print "Assigning nick"
         if(not SOCKET_TO_NICK.has_key(self.source)):
-            if(not NICK_TO_SOCKET.has_key(self.data[0])):
-                NICK_TO_SOCKET[self.data[0]] = self.source
-                SOCKET_TO_NICK[self.source] = self.data[0]
-            else:
-                msg = ":orc.onion 433 * " + self.data[0] + \
-                " :Nickname is already in use.\r\n"
-                self.source[0].send(msg)
+            new_nick = char_list_to_string(random.sample(ALPHABET, NICK_LENGTH))
+            while(NICK_TO_SOCKET.has_key(new_nick)):
+                new_nick = char_list_to_string(random.sample(ALPHABET, NICK_LENGTH))
+            NICK_TO_SOCKET[new_nick] = self.source
+            SOCKET_TO_NICK[self.source] = new_nick
         else:
             self.message = self.message +"\r\n"
             self.target[0].send(self.message)
@@ -119,8 +120,13 @@ def connect(nick, server_address = "irc.oftc.net",
                                                   NICK_TO_SOCKET[nick],
                                                   server_address,
                                                   password,
-                                                  port)
-    
+                                                  port)    
     incoming.add_target(user_connection, server_connection)
     server_connection[0].send("NICK " + nick + "\r\n")
     server_connection[0].send("USER " + nick + " orc orc :orc \r\n")
+
+def char_list_to_string(char_list):
+    ret = ""
+    for i in char_list:
+        ret+=i
+    return ret
