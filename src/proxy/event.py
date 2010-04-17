@@ -6,7 +6,7 @@ import incomingconnections as incoming
 # with ORCBot
 SOCKET_TO_NICK = {}
 NICK_TO_SOCKET = {}
-""" Defines the Event class """
+
 class Event:
     """ Holds the type and handler function for irc events """
 
@@ -52,25 +52,6 @@ class Event:
     def printC(self):
         """print function, used for debugging/testing"""
         print(self.event_type)
-
-#  def error(self):
-#         """TODO:
-#         """
-        
-#     def join(self):
-#         """TODO:
-#         """
-                         
-#     def kick(self):
-#         """TODO
-#         """
-#     def mode(self):
-#         """TODO
-#         """
-        
-#     def part(self):
-#         """TODO
-#         """
         
     def ping(self):
         ''' 
@@ -98,8 +79,7 @@ class Event:
         if(self.data[0]=="orcbot"):
             print "target is orcbot"
             self.target = self.orcbot
-            self.message = ":" + SOCKET_TO_NICK[self.source] + "!~@localhost " 
-            + self.message
+            self.message = ":" + SOCKET_TO_NICK[self.source] + "!~@localhost "+ self.message
 
         if(self.source == self.orcbot):
             print "source is orcbot"
@@ -110,22 +90,12 @@ class Event:
         print self.target
         print "*******message to send"
         print self.message
-        #TODO alter message to reflect hostmasks and such
         if(self.target):
             try:
                 self.target[0].sendall(self.message)
             except socket.error, err:
                 print "can't send"
                 print err
-        
-            
-#     def privnotice(self):
-#         """TODO
-#         """
-        
-#     def pubmsg(self):
-#         """TODO
-#         """
 
     def nick(self):
         print "Assigning nick"
@@ -140,20 +110,7 @@ class Event:
         else:
             self.message = self.message +"\r\n"
             self.target[0].send(self.message)
-           
-#     def pubnotice(self):
-#         """TODO
-#         """
-#     def quit(self):
-#         """TODO
-#         """
 
-#     def invite(self):
-#         """TODO
-#         """
-#     def pong(self):
-#         """TODO
-#         """
 def connect(nick, server_address = "irc.oftc.net",
             port = 6667, password = None):
     ''' Connects a user to a IRC server '''

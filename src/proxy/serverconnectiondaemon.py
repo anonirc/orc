@@ -48,9 +48,6 @@ def connect_to_server(nick, connection, server_address,
     - password: password on the receiving server
     - port: port with which you wish to connect
     """
-    #TODO Write messages to send
-    #nick password and identifing information to IRC
-    #TODO Error checking/exception handling
     tmp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     tmp.connect((server_address, port))
     tmp.settimeout(.5)
@@ -83,7 +80,8 @@ def respondToIdents():
         for d in data:
             d[0].strip().split(",")
             if(IDENT_RESPONSES.has_key((int(d[0][0]),int(d[0][1])))):
-                d[1][0].send(d[0][0]+d[0][1]+" :USERID:UNIIX:"+IDENT_RESPONSES[(int(d[0][0]),int(d[0][1]))]+"\r\n")
+                print IDENT_RESPONSES[(int(d[0][0]),int(d[0][1]))]
+                d[1][0].send(d[0][0]+d[0][1]+" :USERID:UNIX:"+IDENT_RESPONSES[(int(d[0][0]),int(d[0][1]))]+"\r\n")
 def _receiveOrNone(sock):
     try:
         tmp = (sock[0].recv(2**14), sock)
