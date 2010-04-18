@@ -16,6 +16,7 @@ import orcbot
 import banhandler
 import incomingconnections as incoming
 import serverconnectiondaemon as outgoing
+import event as event
 
 # Check what user has initiated the script
 PROCESS = os.popen("whoami")
@@ -57,6 +58,8 @@ try:
                                CONFIG.get('ORC', 'bh_user'), 
                                CONFIG.get('ORC', 'bh_passwd'), 
                                CONFIG.get('ORC', 'bh_db'))
+    #setting the reference to the banhandler in event
+    event.BANHANDLER = BH
 except ValueError:
     print ("ERROR: Accessing the options for the banhandler failed, " +
            "please review your orc.conf file.")

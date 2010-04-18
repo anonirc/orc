@@ -104,6 +104,7 @@ class BanHandler:
             if(record[0] > 0):
                 return True
         return False
+    
     def is_banned_from_server(self, pseudonym, server):
         '''
         Takes two arguments, pseudonym and server.

@@ -9,6 +9,8 @@ SOCKET_TO_NICK = {}
 NICK_TO_SOCKET = {}
 ALPHABET = "abcdefghijklmnopqrstuvwxABCDEFGHIJKLMNOPQRSTUVWX"
 NICK_LENGTH = 8
+BANHANDLER = None
+VALIDATED_USERS = None
 
 class Event:
     """ Holds the type and handler function for irc events """
