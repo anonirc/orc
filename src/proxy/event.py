@@ -106,10 +106,15 @@ class Event:
         if(len(self.data)==3):
             print self.data
             if re.match("\+b", self.data[1]):
-                print "++++++++++++++++++++++"
-                print "*****New ban detected****"
-                print "++++++++++++++++++++++"
-                print self.data[2].split("!")[1].split("@")[0]
+                #TODO: Currently you'll get banned if anyone with your username is banned
+                #TODO: Detect the difference between klines and channelbans
+                username = SOCKET_TO_NICK[self.target]                
+                banned_user = self.data[2].split("!")[1].split("@")[0]
+                if(username == banned_user):
+                    print "about to be BANNED", username, "   ", banned_user
+                    user_pseudonym = VALIDATED_USERS.get_pseudonym(username)
+                    network = self.source[1]
+                    BANHANDLER.add_ban(10080, user_pseudonym, network, self.data[0], 0)
         if(self.target):
             self.message = self.message +"\r\n"
             self.target[0].send(self.message)
