@@ -41,6 +41,7 @@ class BanHandler:
         '''
         Add a ban to the banlist database.
         '''
+        print "Banning", pseudonym,"for", duration
         self.cursor.execute("INSERT INTO bandb (duration_mins, pseudonym, " +
         "network, channel, serverban) VALUES (%s, %s, %s, %s, %s)", \
                             (duration, pseudonym, network, channel, serverban))

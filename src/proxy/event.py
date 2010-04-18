@@ -54,7 +54,22 @@ class Event:
     def get_data(self):
         """Gets the data"""
         return self.data
+
+    def join(self):
+        channel = self.data[0]
+        target_server = self.target[1]        
+        user_pseudonym =  VALIDATED_USERS.get_pseudonym(SOCKET_TO_NICK.get(self.source, None))
         
+        if user_pseudonym:
+            if(BANHANDLER.is_banned_from_channel(user_pseudonym, target_server, channel)):
+                self.source[0].send(":orcbot!~@localhost PRIVMSG "+SOCKET_TO_NICK[self.source]+" :You're banned from "+channel+"\r\n")
+            elif(self.target):
+                self.message = self.message +"\r\n"
+                self.target[0].sendall(self.message)
+        elif(self.target):
+            self.message = self.message +"\r\n"
+            self.target[0].sendall(self.message)
+    
     def ping(self):
         ''' 
         If irssi or other client tries to ping ORC while
@@ -121,11 +136,10 @@ class Event:
 
 
     def nick(self):
-        print "Assigning nick"
         if(not SOCKET_TO_NICK.has_key(self.source)):
-            new_nick = char_list_to_string(random.sample(ALPHABET, NICK_LENGTH))
+            new_nick = _char_list_to_string(random.sample(ALPHABET, NICK_LENGTH))
             while(NICK_TO_SOCKET.has_key(new_nick)):
-                new_nick = char_list_to_string(random.sample(ALPHABET, NICK_LENGTH))
+                new_nick = _char_list_to_string(random.sample(ALPHABET, NICK_LENGTH))
             NICK_TO_SOCKET[new_nick] = self.source
             SOCKET_TO_NICK[self.source] = new_nick
         else:
@@ -134,7 +148,9 @@ class Event:
 
 def connect(nick, server_address = "irc.oftc.net",
             port = 6667, password = None):
-    ''' Connects a user to an IRC server '''
+    ''' Connects a user to an IRC server and handles initial user
+    registration
+    '''
     user_connection = NICK_TO_SOCKET[nick]
     server_connection = server.connect_to_server( nick,
                                                   NICK_TO_SOCKET[nick],
@@ -145,7 +161,8 @@ def connect(nick, server_address = "irc.oftc.net",
     server_connection[0].send("NICK " + nick + "\r\n")
     server_connection[0].send("USER " + nick + " orc orc :orc \r\n")
 
-def char_list_to_string(char_list):
+def _char_list_to_string(char_list):
+    """ Takes a list of chars and returns a string"""
     ret = ""
     for i in char_list:
         ret+=i
