@@ -26,7 +26,7 @@ class Event:
         self.data = data
         self.socket = source
         self.message = raw
-        self.orcbot = orcbot  
+        self.orcbot_socket = orcbot  
 
     def apply_handler(self):
         """ The code that calls the event handler for the event type """
@@ -53,10 +53,6 @@ class Event:
     def get_data(self):
         """Gets the data"""
         return self.data
-   
-    def printC(self):
-        """print function, used for debugging/testing"""
-        print(self.event_type)
         
     def ping(self):
         ''' 

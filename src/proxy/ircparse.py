@@ -19,7 +19,7 @@ def process_data(connection, orcbot_address):
     """ Takes in a connection, tries to read data from
     the socket, and returns an Event of it
     """
-    e = []
+    event_list = []
     try:
         print "recvin'"
         new_data = connection[0][0].recv(2**14)
@@ -28,17 +28,14 @@ def process_data(connection, orcbot_address):
         
     except socket.error, err:
         #Connection reset by peer
-        print("Socket errror")
+        print("Socket error")
         print err
-        #TODO: return a connectionClosed event
         return None
     
     if not new_data:
-        #print("nothing new")
-        # Read nothing: connection must be down.
+        # Read nothing: broken send of some sort
         return None
     
-
     lines = _linesep_regexp.split(new_data)
    
     prefix = None
@@ -67,5 +64,5 @@ def process_data(connection, orcbot_address):
         if command in numeric_events:
             command = numeric_events[command]     
         print "makin' event"
-        e.append(event.Event(command, connection[0], connection[1], orcbot_address, line, arguments))
-    return e
+        event_list.append(event.Event(command, connection[0], connection[1], orcbot_address, line, arguments))
+    return event_list

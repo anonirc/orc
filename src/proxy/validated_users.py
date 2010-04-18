@@ -4,7 +4,6 @@ class ValidatedUsers():
     currently connected and whose pseudonyms have been validated
     '''
     def __init__(self):
-        #TODO work out communication by depending classes
         #TODO: Handle exceptions?
         self.dict_nick_to_pseudonym = dict()
         
@@ -23,8 +22,6 @@ class ValidatedUsers():
     def get_pseudonym(self, nick):
         return self.dict_nick_to_pseudonym.get(nick)
         
-    '''
-    '''
     def remove_disconnected_users(self):
         # possible triggered by an event and may not need implementation
         return
