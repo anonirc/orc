@@ -1,4 +1,5 @@
 import socket
+import re
 import random
 import serverconnectiondaemon as server
 import incomingconnections as incoming
@@ -72,30 +73,47 @@ class Event:
     def privmsg(self):
         """ Handles privmsg event
         """
-        print "Raw message"
-        print self.message
-        print "****Source**"
-        print self.source
+        # print "Raw message"
+#         print self.message
+#         print "****Source**"
+#         print self.source
         #if message is for orcbot, set orcbot as target
         if(self.data[0]=="orcbot"):
             print "target is orcbot"
-            self.target = self.orcbot
+            self.target = self.orcbot_socket
             self.message = ":" + SOCKET_TO_NICK[self.source] + "!~@localhost "+ self.message
-        if(self.source == self.orcbot):
+        if(self.source == self.orcbot_socket):
             print "source is orcbot"
             self.target = NICK_TO_SOCKET[self.data[0]]
             self.message = ":orcbot!~@localhost " + self.message
         self.message = self.message + "\r\n"
-        print "*******target**"
-        print self.target
-        print "*******message to send"
-        print self.message
+       #  print "*******target**"
+#         print self.target
+#         print "*******message to send"
+#         print self.message
         if(self.target):
             try:
                 self.target[0].sendall(self.message)
             except socket.error, err:
                 print "can't send"
                 print err
+                
+    def mode(self):
+        """Detect if a mode message contains a ban
+        for the current user, if so, adds it to the ban database, before
+        it passes the message on
+        """
+        if(len(self.data)==3):
+            print self.data
+            if re.match("\+b", self.data[1]):
+                print "++++++++++++++++++++++"
+                print "*****New ban detected****"
+                print "++++++++++++++++++++++"
+                print self.data[2].split("!")[1].split("@")[0]
+        if(self.target):
+            self.message = self.message +"\r\n"
+            self.target[0].send(self.message)
+
 
     def nick(self):
         print "Assigning nick"
