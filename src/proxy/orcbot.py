@@ -14,10 +14,9 @@ from hashlib import md5
 import random
 import re
 
+import event as event
 from ircbot import SingleServerIRCBot
 from irclib import nm_to_n
-from event import connect
-
 import validated_users
 
 class ORCBot:
@@ -48,12 +47,13 @@ class ORCBot:
         self.gpg_info = gpg_info
         # We keep a list of connections that have validated themselves
         self.val_users = validated_users.ValidatedUsers()
+        # Share the validatedUsers with event
+        event.VALIDATED_USERS = self.val_users
         # To tell the users of orcbot where they can aquire a pseuodonym
         self.pm_name = pm_name
         # OrcBot needs to know if users are authorized to connect to servers 
         # and channels therefore it contains a banhandler.
-        self.ban_han = ban_db
-                
+        self.ban_han = ban_db                
         # Starts an instance of SingleServerIRCBot from the irclib project 
         # with OrcBot as its parent.
         self.irclibbot = IRCLibBot(self, server_info)
@@ -192,8 +192,7 @@ class ORCBot:
                     con.privmsg(nick, "ERROR: You are banned from " +
                                     "this server.")
                 else:
-                    # Creates a connection Event
-                    connect(nick, server, port)
+                    event.connect(nick, server, port)
                     
             elif(len(pieces[2]) > 1):
                 # This triggers if the user has supplied two arguments
@@ -209,7 +208,7 @@ class ORCBot:
                         con.privmsg(nick, "Connecting you to " + server + 
                         " at port " + port +  ". In seconds you will be able" + 
                         "to join a channel. Do so as you normally would.")
-                        connect(nick, server, int(port))
+                        event.connect(nick, server, int(port))
                 else:
                     con.privmsg(nick, "Port cannot contain anything " +
                     "but numbers. Try again. For help type 'help connect'")
