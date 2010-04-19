@@ -79,7 +79,8 @@ try:
                           CONFIG.get('ORC', 'orcbot_keyid')),
                           # BanHandler and URI of PM 
                           BH, 
-                          CONFIG.get('ORC', 'orcbot_pmname')
+                          CONFIG.get('ORC', 'orcbot_pmname'),
+                          CONFIG.get('ORC', 'pseudonym_dur')
                           )
 except ValueError:
     print ("ERROR: Accessing the options for the ORCBot failed, " +

@@ -13,6 +13,7 @@ import GnuPGInterface
 from hashlib import md5
 import random
 import re
+import time
 
 import event as event
 from ircbot import SingleServerIRCBot
@@ -29,7 +30,7 @@ class ORCBot:
     Code used includes all references to ircbot or irclib.
     '''
     #TODO: Handle exceptions throughout the class?
-    def __init__(self, server_info, gpg_info, ban_db, pm_name):
+    def __init__(self, server_info, gpg_info, ban_db, pm_name, pseudonym_dur):
         '''
         Initializes the OrcBot object.
         Takes arguments: 
@@ -57,6 +58,8 @@ class ORCBot:
         # Starts an instance of SingleServerIRCBot from the irclib project 
         # with OrcBot as its parent.
         self.irclibbot = IRCLibBot(self, server_info)
+        # Set how long the pseudonym will be valid
+        self.pseudonym_dur = long(pseudonym_dur)
 
         
     def validate_pseudonym(self, user_input, nick, con):
@@ -128,7 +131,18 @@ class ORCBot:
         # is a good signature, and the right key ID have been used, check
         # when the signature was made.
         if ("Good" in signature):
-            if (keyid in signature):    
+            if (keyid in signature):
+                # Check that the signature is not too old
+                timesigned = time.mktime(
+                    time.strptime(signature[20:47], "%a %d %b %Y %H:%M:%S %p"))
+                timediff = time.time() - timesigned
+                hours = timediff / 60 / 60
+                #days = hours / 24
+                if (hours > self.pseudonym_dur):
+                    con.privmsg(nick, "Validation failed, sorry this " + 
+                                "signature is too old.")
+                    return False
+
                 con.privmsg(nick, "Validation succeded, good signature made.") 
                 return True
             else:
@@ -242,8 +256,8 @@ class ORCBot:
         elif (cmd=="help connect"):
             con.privmsg(nick, "Connects you to an IRC server of your choice.")
             con.privmsg(nick, "The command may take one or two arguments, "
-                      + "servername and port. If no port is defined, the " + 
-                      "standard port is selected by default.")
+                      + "servername and port. If no port is defined, " + 
+                      "port 6667 is selected by default.")
             con.privmsg(nick, "Example: 'connect irc.oftc.net 6667'")
             
         else:
@@ -272,7 +286,7 @@ class ORCBot:
                 self.val_users.add(nick, create_md5(pseudonym))
                 
             else:
-                con.privmsg(nick, "Validation failed, check that you are " + 
+                con.privmsg(nick, "Check that you are " + 
                           "using a valid pseudonym. Type 'help validate' " +
                           "for more information." )
     def start(self):
