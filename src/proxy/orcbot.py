@@ -136,9 +136,9 @@ class ORCBot:
                 timesigned = time.mktime(
                     time.strptime(signature[20:47], "%a %d %b %Y %H:%M:%S %p"))
                 timediff = time.time() - timesigned
-                hours = timediff / 60 / 60
-                #days = hours / 24
-                if (hours > self.pseudonym_dur):
+                minutes = timediff / 60
+                
+                if (minutes > self.pseudonym_dur):
                     con.privmsg(nick, "Validation failed, sorry this " + 
                                 "signature is too old.")
                     return False
