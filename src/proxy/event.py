@@ -142,7 +142,7 @@ class Event:
                 new_nick = _char_list_to_string(random.sample(ALPHABET, NICK_LENGTH))
             NICK_TO_SOCKET[new_nick] = self.source
             SOCKET_TO_NICK[self.source] = new_nick
-        else:
+        elif(self.target):
             self.message = self.message +"\r\n"
             self.target[0].send(self.message)
 
