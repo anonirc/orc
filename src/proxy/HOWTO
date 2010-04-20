@@ -1,0 +1,55 @@
+This documentation is written by John Hanssen Kolstad
+<johnhanssen@gmail.com>.
+
+This document explains how to set up and install the ORC proxy software.
+
+0. Requirements
+
+ - The computer needs to run a Unix/Linux type OS (like Debian/Ubuntu)
+ - Python needs to be installed
+ - Tor needs to be set up and running as a Hidden Service (on port 6667)
+
+	https://www.torproject.org/docs/tor-hidden-service.html.en
+
+1. Install IRCLib
+
+ Download IRCLib
+
+ The latest version can be downloaded from:
+ http://python-irclib.sourceforge.net/
+
+ Extract the downloaded file:
+
+ $ untar zxvf python-irclib-0.4.6.tar.gz
+
+ Change to the downloaded directory:
+
+ $ cd python-irclib-0.4.6.tar.gz
+
+ Run the setup.py script with superuser privileges:
+
+ $ sudo python setup.py install
+
+2. Install python-mysqldb
+
+ Install python-mysqldb from the Debian/Ubuntu repository:
+
+ $ sudo aptitude install python-mysqldb
+
+3. Check out the most recent source code from the ORC repository
+
+ Either download from the GitHub website :
+
+ http://github.com/anonirc/orc
+
+ or using Git $ git clone git://github.com/anonirc/orc.git
+
+4. Edit the orc.conf configuration file to suit your install environment
+
+ $ vim orc/src/proxy/orc.conf
+
+ The configuration file has suggestions for default values commented out.
+
+5. Start the proxy server by running the init script
+
+ $python __init__.py
