@@ -3,7 +3,53 @@ This documentation is written by Runa Sandvik <runa.sandvik@gmail.com>.
 To check out the code, write 'git clone
 git://github.com/anonirc/orc.git'.
 
+The code have been tested with Python 2.5.2
+
 1. General information about the scripts
+
+    1.1 __init__.py
+
+	The purpose of this init script is to easily set up and
+	configure a test environment for the Proxy. All global variables
+	and instances will be configured here.
+
+    1.2 banhandler.py
+
+	The abstraction layer for the MySQL banlist database for the
+	Proxy. The module contains all functions needed to manipulate
+	the database.
+
+    1.3 event.py
+	
+	Holds the type and handler function for IRC events.
+
+    1.4 incomingconnections.py
+
+	Handles incoming connections and traffic.
+
+    1.5 ircparse.py
+
+	Will take a connection, read data from the socket and return an
+	event.
+
+    1.6 orc.conf
+
+	The configuration file for ORC.
+
+    1.7 orcbot.py
+
+	The IRC bot that serves as the communication medium between the
+	Proxy and the user.
+
+    1.8 serverconnectiondaemon.py
+
+	Opens connections to IRC servers and polls for events on the
+	socket object.
+
+    1.9 validated_users.py
+
+	An object to hold the connections for users who are currently
+	connected, and whose pseudonyms have been validated.
 
 2. Prerequisites
 
@@ -12,3 +58,24 @@ git://github.com/anonirc/orc.git'.
     This library is intended to encapsulate the IRC protocol. The
     library is available in both Debian and Ubuntu as python-irclib.
     You can also download it from http://python-irclib.sourceforge.net/
+
+    2.2 Install MySQLdb
+
+    MySQLdb is an interface to the popular MySQL database server for
+    Python. The module is available in both Debian and Ubuntu as
+    python-mysqldb. You can also download it from
+    http://sourceforge.net/projects/mysql-python/.
+
+    2.3 Install GnuPGInterface
+
+    GnuPGInterface is a Python module for GnuPG. The module is
+    available in both Debian and Ubuntu as python-gnupginterface.
+    You can also download it from http://py-gnupg.sourceforge.net/.
+
+    2.4 Create a GPG key
+
+    If you do not have a GPG key, you will need to create one in order
+    for orcbot.py to validate the signed pseudonym. See Section 1 in the
+    HOWTO for the Pseudonym Manager for more information.
+
+3. Configuration
