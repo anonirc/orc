@@ -1,3 +1,9 @@
+"""
+@author: Lars Vonli(lars@vonli.no)
+See LICENSE for licensing information.
+
+"""
+
 import socket
 import re
 import random
@@ -54,6 +60,7 @@ class Event:
     def get_data(self):
         """Gets the data"""
         return self.data
+    
 
     def join(self):
         """Checks if a pseudonym is banned from a channel, if it is you are denied
@@ -153,6 +160,7 @@ class Event:
         elif(self.target):
             self.message = self.message +"\r\n"
             self.target[0].send(self.message)
+            
 
 def connect(userid, server_address = "irc.oftc.net",
             port = 6667,nick = None, password = None):

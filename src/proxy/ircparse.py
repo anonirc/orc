@@ -1,4 +1,10 @@
-"""Copies a lot from IRClib, adapted to be usable for making a bouncer
+"""
+Copies a lot from IRClib, adapted to be usable for making a bouncer
+
+@author: Lars Vonli(lars@vonli.no)
+
+See LICENSE for licensing information.
+
 """
 import re
 import socket

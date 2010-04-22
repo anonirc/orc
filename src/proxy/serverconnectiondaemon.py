@@ -1,4 +1,6 @@
-""" defines the serverConnectionDaemon
+"""
+@author: Lars Vonli(lars@vonli.no)
+
 """
 import threading
 import socket
