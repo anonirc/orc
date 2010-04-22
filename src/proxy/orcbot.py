@@ -83,9 +83,9 @@ class ORCBot:
         keyid = self.gpg_info[1]
         ### End config ###
         
-        ### Verify signature of user input using GPG 
+        ### Verify gpg_output of user input using GPG 
         
-        # Write user input to a random file in /tmp, so that the signature
+        # Write user input to a random file in /tmp, so that the gpg_output
         # can be verified later on. Use small letters, big letters and
         # digits for the filename.
         letters = "abcdefghijklmnopqrstuvwxyz"
@@ -104,25 +104,21 @@ class ORCBot:
         # Open the file to read the contents
         verify = open(input_file, 'r')
     
-        # Verify the signature
+        # Verify the gpg_output
         clearsign = gnupg.run(['--no-tty'], ['--decrypt'],
         create_fhs=['stdout','stderr'], attach_fhs={'stdin': verify})
         
         # Read the output from gnupg, and split it into an array so that it
         # can be evaluated.
-        signature = clearsign.handles['stderr'].read()
-        # For debugging
-        # con.privmsg(nick, signature)
-        # print signature
-    
-        # The signature can not be checked if the public key is not found
-        if "public key not found" in signature:
-            con.privmsg(nick, "Validation failed, It seems like the key has " + 
-                      "not been imported.")
+        gpg_output = clearsign.handles['stderr'].read()
+        
+        if(self.has_expired(gpg_output)):
+            con.privmsg(nick, "Validation failed, sorry this " + 
+                                "signature is too old.")
             return False
     
         # Check if the signature is valid. Do not accept a bad signature.
-        if "BAD" in signature:
+        if "BAD" in gpg_output:
             con.privmsg(nick, "Validation failed, Sorry, this signature is " + 
                       "not valid")
             return False
@@ -130,28 +126,43 @@ class ORCBot:
         # Accept a good signature if it is signed by the right key ID. If it
         # is a good signature, and the right key ID have been used, check
         # when the signature was made.
-        if ("Good" in signature):
-            if (keyid in signature):
+        if ("Good" in gpg_output):
+            if (keyid in gpg_output): 
                 # Check that the signature is not too old
-                timesigned = time.mktime(
-                    time.strptime(signature[20:47], "%a %d %b %Y %H:%M:%S %p"))
-                timediff = time.time() - timesigned
-                minutes = timediff / 60
-                
-                if (minutes > self.pseudonym_dur):
-                    con.privmsg(nick, "Validation failed, sorry this " + 
-                                "signature is too old.")
-                    return False
+                # Parses the output from GPG to create a timestamp, then
+                # compares it to the local time to see if the sig. is expired
+                #TODO: Look in to possible timezone bug.
 
                 con.privmsg(nick, "Validation succeded, good signature made.") 
                 return True
             else:
                 con.privmsg(nick, "Validation failed, wrong key id.") 
+                return False
+        
+        # The signature can not be checked if the public key is not found
+        if "public key not found" in gpg_output:
+            con.privmsg(nick, "Validation failed, It seems like the key has " + 
+                      "not been imported.")
+            return False
             
         # If no if sentences has kicked in, system is broken
         con.privmsg(nick, "Validation reached end of function. " + 
                   "Something is wrong with the validation. Please contact "
-                  + " the server administrator.")
+                  + "the server administrator.")
+        return False
+    
+    def has_expired(self, gpg_output):
+        '''
+        Takes the output of a gpg verification attempt and returns True
+        or False depending on the proxy configuration of pseudonym durations.
+        '''
+        timesigned = time.mktime(
+                    time.strptime(gpg_output[20:47], "%a %d %b %Y %H:%M:%S %p"))
+        timediff = time.time() - timesigned
+        minutes = timediff / 60
+
+        if ((minutes > 0) and (minutes > self.pseudonym_dur)):
+            return True
         return False
 
     def user_interaction(self, cmd, con, nick):
@@ -162,8 +173,7 @@ class ORCBot:
         # If the nick is in the dictionary of users currently undergoing 
         # validation, we collect data till we receive "done" from the user.
         if(self.validation_in_progress.has_key(nick)):  
-            # If True it is it means that the nick is currently involved 
-            # in a validation process. And we should fetch the pseudonym. 
+            # Store all input in a string. 
             self.enter_pseudonym(nick, cmd, con)
 
         elif (cmd == "validate"):
@@ -174,63 +184,14 @@ class ORCBot:
             "lines, we will fill them in for you." +
             " Complete the process by typing 'done' on a single line.")
             con.privmsg(nick, "WARNING: after typing 'done' please allow " + 
-                    "atleast one minute before receiving validation results")
-            #Placeholder for pseudonym input
+                    "at least one minute before receiving validation results")
+            # Add user to the validation_in_progress list, orcbot now accepts
+            # all input given.
             self.validation_in_progress[nick] = ""
 
         elif (cmd[0:7] == "connect"):
-            #if(not self.val_users.haskey(nick)):
-            if(not self.val_users.is_validated(nick)):
-                con.privmsg(nick, "You are not validated and may not " +
-                            "connect. Type 'help validate' for instructions.")
-                return
-            # This regexp returns a string array of word, which it parses by
-            # seperating them by whitespace.
-            pieces = [p for p in re.split("( |\\\".*?\\\"|'.*?')", cmd) if
-            p.strip()]
-            # Set the default port in case the user does not specify one
-            port = 6667
-            if(len(pieces) < 2):
-                con.privmsg(nick, "You supplied too few arguments (atleast"
-                + " one needed), type 'help connect' for more info.")
-            elif(len(pieces) < 3): 
-                server =  pieces[1] # Server
-                con.privmsg(nick, "You specified no port, defaulting to " + 
-                str(port) +
-                ". In seconds you will be able to join a channel. Do so as " +
-                "you normally would.")
-                # Get the connection object from SCD and check if it is banned
-                serverban = self.ban_han.is_banned_from_server(
-                                self.val_users.get_pseudonym(nick), server)
-                if (serverban):
-                    con.privmsg(nick, "ERROR: You are banned from " +
-                                    "this server.")
-                else:
-                    event.connect(nick, server, port)
-                    
-            elif(len(pieces[2]) > 1):
-                # This triggers if the user has supplied two arguments
-                server =  pieces[1] # Server
-                port =  pieces[2]
-                if(re.match("[0-9]+", port)):
-                    serverban = self.ban_han.is_banned_from_server(
-                                self.val_users.get_pseudonym(nick), server)
-                    if (serverban):                        
-                        con.privmsg(nick, "ERROR: You are banned from " +
-                                            "this server.")
-                    else:    
-                        con.privmsg(nick, "Connecting you to " + server + 
-                        " at port " + port +  ". In seconds you will be able" + 
-                        "to join a channel. Do so as you normally would.")
-                        event.connect(nick, server, int(port))
-                else:
-                    con.privmsg(nick, "Port cannot contain anything " +
-                    "but numbers. Try again. For help type 'help connect'")
-                    return
-            else:
-                con.privmsg(nick, "Something went wrong, please " +
-                "contact the system administrator.")
-
+            self.connect(cmd, con, nick)
+            
         elif (cmd=="help"):
             con.privmsg(nick, "Greetings, this bot support the following " + 
                       "commands:")
@@ -238,8 +199,6 @@ class ORCBot:
             con.privmsg(nick, "validate - Validate a pseudonym.")
             con.privmsg(nick, "connect  - Connect to an IRC server. " + 
                       "requires validation.")
-            #con.privmsg(nick, "join     - Join a channel. requires " + 
-            #"validation and a active server connection.")
             con.privmsg(nick, "Type 'help <commandname>' to get more info" + 
                       "about each command.")
             
@@ -263,12 +222,71 @@ class ORCBot:
         else:
             con.privmsg(nick, "You wrote: '" + cmd + "' this is not a " + 
                      "recognized command, try typing 'help'")
+            
+    def connect(self, cmd, con, nick):
+        '''
+        Called when the user has issued a wish to connect.
+        Determines next action by checking the rest of the user's input and
+        if the user is authorized to connect.
+        '''
+        if(not self.val_users.is_validated(nick)):
+            con.privmsg(nick, "You are not validated and may not " +
+                        "connect. Type 'help validate' for instructions.")
+            return
+        
+        # This regexp returns a string array of words, which it parses by
+        # seperating them by whitespace.
+        words = [p for p in re.split("( |\\\".*?\\\"|'.*?')", cmd) if p.strip()]
+        # Set the default port in case the user does not specify one
+        port = 6667
+        if(len(words) < 3):
+            con.privmsg(nick, "You supplied too few arguments (at least"
+            + " two needed), type 'help connect' for more info.")
+            return
+            
+        server =  words[2] # Server should be the second argument
+        serverban = self.ban_han.is_banned_from_server(
+                self.val_users.get_pseudonym(nick), server)
+        if (serverban):
+            con.privmsg(nick, "ERROR: You are banned from " +
+                            "this server.")
+            return
+        try:      
+            if (words[3]): #If the user has specified a port, we use that instead
+                if(re.match("[0-9]+", words[3])):
+                    port = int(words[3])
+                else:
+                    con.privmsg(nick, "Port cannot contain anything " +
+                            "but numbers. Try again. For help type 'help connect'")
+                    return
+        except IndexError:
+            pass
+        #words[1] is the nick
+        event.connect(words[1], server, port)
+
+# Tell the user what happened
+        if(words[2]):
+            con.privmsg(nick, "Connecting you to " + server + 
+            " at port " + port +  ". You should now be able" + 
+            "to join a channel. Do so as you normally would.")
+            return
+        #TODO: Implement nick functionality to the connect statement 
+        else:
+            con.privmsg(nick, "You specified no port, defaulting to port " + 
+                        str(port) + ". You should now be able to join a " +
+                        "channel. Do so as you normally would.")
+            return
+                    
+        # If function is still running, something has gone wrong
+        con.privmsg(nick, "Something went wrong, please " +
+                    "contact the system administrator.")
         
     def enter_pseudonym(self, nick, cmd, con):
         '''
         This function is called as long as the user is in the validation 
-        dictionary and havent finished their validation.
+        dictionary and haven't finished their validation.
         '''
+        #TODO: Set a timeout, people can get confused with no response.
         if(cmd!="done"):
             self.validation_in_progress[nick] += cmd + "\n"
             if(("Version" in cmd) or ("Hash" in cmd)):
@@ -323,15 +341,5 @@ class IRCLibBot(SingleServerIRCBot):
         # from here OrcBot code takes over SingleServerIRCBot
         self.orc.user_interaction(eee.arguments()[0], con, 
                                   nm_to_n(eee.source()))
+        # This means:
         # self.orc.user_interaction(cmd, con, nick)
-                
-def main():
-    '''
-    If OrcBot is not called from a init script externally, fill it with
-    dummy values.
-    '''
-    ORCBot("HERE GOES THE LOCATION OF THE KEYRING", "HERE GOES KEYID",
-    "Placeholder", "Placeholder")
-
-if __name__ == "__main__":
-    main()
