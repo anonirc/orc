@@ -67,6 +67,5 @@ def process_data(connection, orcbot_address):
         # Translate numerics into more readable strings.
         if command in numeric_events:
             command = numeric_events[command]     
-        print "makin' event"
         event_list.append(event.Event(command, connection[0], connection[1], orcbot_address, line, arguments))
     return event_list
