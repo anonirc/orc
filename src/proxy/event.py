@@ -6,10 +6,10 @@ import incomingconnections as incoming
 
 # Holds the made up nicks that each connection has when talking
 # with ORCBot
-SOCKET_TO_NICK = {}
-NICK_TO_SOCKET = {}
+SOCKET_TO_USERID = {}
+USERID_TO_SOCKET = {}
 ALPHABET = "abcdefghijklmnopqrstuvwxABCDEFGHIJKLMNOPQRSTUVWX"
-NICK_LENGTH = 8
+USERID_LENGTH = 8
 BANHANDLER = None
 VALIDATED_USERS = None
 
@@ -58,11 +58,11 @@ class Event:
     def join(self):
         channel = self.data[0]
         target_server = self.target[1]        
-        user_pseudonym =  VALIDATED_USERS.get_pseudonym(SOCKET_TO_NICK.get(self.source, None))
+        user_pseudonym =  VALIDATED_USERS.get_pseudonym(SOCKET_TO_USERID.get(self.source, None))
         
         if user_pseudonym:
             if(BANHANDLER.is_banned_from_channel(user_pseudonym, target_server, channel)):
-                self.source[0].send(":orcbot!~@localhost PRIVMSG "+SOCKET_TO_NICK[self.source]+" :You're banned from "+channel+"\r\n")
+                self.source[0].send(":orcbot!~@localhost PRIVMSG "+SOCKET_TO_USERID[self.source]+" :You're banned from "+channel+"\r\n")
             elif(self.target):
                 self.message = self.message +"\r\n"
                 self.target[0].sendall(self.message)
@@ -96,10 +96,10 @@ class Event:
         if(self.data[0]=="orcbot"):
             print "target is orcbot"
             self.target = self.orcbot_socket
-            self.message = ":" + SOCKET_TO_NICK[self.source] + "!~@localhost "+ self.message
+            self.message = ":" + SOCKET_TO_USERID[self.source] + "!~@localhost "+ self.message
         if(self.source == self.orcbot_socket):
             print "source is orcbot"
-            self.target = NICK_TO_SOCKET[self.data[0]]
+            self.target = USERID_TO_SOCKET[self.data[0]]
             self.message = ":orcbot!~@localhost " + self.message
         self.message = self.message + "\r\n"
        #  print "*******target**"
@@ -123,7 +123,7 @@ class Event:
             if re.match("\+b", self.data[1]):
                 #TODO: Currently you'll get banned if anyone with your username is banned
                 #TODO: Detect the difference between klines and channelbans
-                username = SOCKET_TO_NICK[self.target]                
+                username = SOCKET_TO_USERID[self.target]                
                 banned_user = self.data[2].split("!")[1].split("@")[0]
                 if(username == banned_user):
                     print "about to be BANNED", username, "   ", banned_user
@@ -136,30 +136,32 @@ class Event:
 
 
     def nick(self):
-        if(not SOCKET_TO_NICK.has_key(self.source)):
-            new_nick = _char_list_to_string(random.sample(ALPHABET, NICK_LENGTH))
-            while(NICK_TO_SOCKET.has_key(new_nick)):
-                new_nick = _char_list_to_string(random.sample(ALPHABET, NICK_LENGTH))
-            NICK_TO_SOCKET[new_nick] = self.source
-            SOCKET_TO_NICK[self.source] = new_nick
+        if(not SOCKET_TO_USERID.has_key(self.source)):
+            new_userid = _char_list_to_string(random.sample(ALPHABET, USERID_LENGTH))
+            while(USERID_TO_SOCKET.has_key(new_userid)):
+                new_userid = _char_list_to_string(random.sample(ALPHABET, USERID_LENGTH))
+            USERID_TO_SOCKET[new_userid] = self.source
+            SOCKET_TO_USERID[self.source] = new_userid
         elif(self.target):
             self.message = self.message +"\r\n"
             self.target[0].send(self.message)
 
-def connect(nick, server_address = "irc.oftc.net",
-            port = 6667, password = None):
+def connect(userid, server_address = "irc.oftc.net",
+            port = 6667,nick = None, password = None):
     ''' Connects a user to an IRC server and handles initial user
     registration
     '''
-    user_connection = NICK_TO_SOCKET[nick]
-    server_connection = server.connect_to_server( nick,
-                                                  NICK_TO_SOCKET[nick],
+    if(not nick):
+        nick = userid
+    user_connection = USERID_TO_SOCKET[userid]
+    server_connection = server.connect_to_server( userid,
+                                                  USERID_TO_SOCKET[userid],
                                                   server_address,
                                                   password,
-                                                  port)    
+                                                  port)
     incoming.add_target(user_connection, server_connection)
     server_connection[0].send("NICK " + nick + "\r\n")
-    server_connection[0].send("USER " + nick + " orc orc :orc \r\n")
+    server_connection[0].send("USER " + userid + " orc orc :orc \r\n")
 
 def _char_list_to_string(char_list):
     """ Takes a list of chars and returns a string"""
