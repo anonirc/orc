@@ -134,7 +134,7 @@ class Event:
                 #TODO: Currently you'll get banned if anyone with your username is banned
                 #TODO: Detect the difference between klines and channelbans
                 username = SOCKET_TO_USERID[self.target]                
-                banned_user = self.data[2].split("!")[1].split("@")[0]
+                banned_user = self.data[2].split("!")[1].split("@")[0].strip("*").strip("~")
                 if(username == banned_user):
                     print "about to be BANNED", username, "   ", banned_user
                     user_pseudonym = VALIDATED_USERS.get_pseudonym(username)
