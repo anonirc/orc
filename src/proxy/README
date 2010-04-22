@@ -78,4 +78,30 @@ The code have been tested with Python 2.5.2
     for orcbot.py to validate the signed pseudonym. See Section 1 in the
     HOWTO for the Pseudonym Manager for more information.
 
+	2.5	Install MySQL
+	
+	Install and set up MySQL from the package repository. Create a database with a 
+	descriptive name (for example "bandb") with a matching username/password.
+
 3. Configuration
+
+	3.1 Set up the banlist table
+	
+	Log in to the database, and create the following table:
+	
+	CREATE TABLE `bandb` (
+	  `banid` int(11) NOT NULL auto_increment,
+	  `timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP,
+	  `duration_mins` int(11) NOT NULL,
+	  `pseudonym` varchar(50) collate utf8_unicode_ci NOT NULL,
+	  `network` varchar(30) collate utf8_unicode_ci NOT NULL,
+	  `channel` varchar(30) collate utf8_unicode_ci default NULL,
+	  `serverban` tinyint(1) NOT NULL default '0',
+	  PRIMARY KEY  (`banid`)
+	) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+	
+	
+	3.2 Configure orc.conf
+
+	Configure the orc.conf file with the information relevant to your setup. Some 	 
+	default values have been provided. 

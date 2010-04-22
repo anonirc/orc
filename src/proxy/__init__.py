@@ -10,7 +10,7 @@ All global variables and instances will be configured from here.
 import os
 import ConfigParser
 import sys
-import mysql_exceptions
+import _mysql_exceptions
 
 import orcbot
 import banhandler
