@@ -56,6 +56,9 @@ class Event:
         return self.data
 
     def join(self):
+        """Checks if a pseudonym is banned from a channel, if it is you are denied
+        access. If not, sends the join message on to the remote IRC server
+        """
         channel = self.data[0]
         target_server = self.target[1]        
         user_pseudonym =  VALIDATED_USERS.get_pseudonym(SOCKET_TO_USERID.get(self.source, None))
@@ -86,7 +89,8 @@ class Event:
         
         
     def privmsg(self):
-        """ Handles privmsg event
+        """ If a privmsg is for orcbot, it's target is set to orcbot. The message
+        is then sent to event.target, unless it doesnt have one
         """
         # print "Raw message"
 #         print self.message
@@ -136,6 +140,10 @@ class Event:
 
 
     def nick(self):
+        """ Sets a userid when the client tries to register with the proxy for the first time.
+        If the client is already connected to a server, passes the nick message on. Otherwise,
+        it's ignored
+        """
         if(not SOCKET_TO_USERID.has_key(self.source)):
             new_userid = _char_list_to_string(random.sample(ALPHABET, USERID_LENGTH))
             while(USERID_TO_SOCKET.has_key(new_userid)):
