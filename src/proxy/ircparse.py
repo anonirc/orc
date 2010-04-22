@@ -27,9 +27,7 @@ def process_data(connection, orcbot_address):
     """
     event_list = []
     try:
-        print "recvin'"
         new_data = connection[0][0].recv(2**14)
-        print "*********"
         print new_data
         
     except socket.error, err:

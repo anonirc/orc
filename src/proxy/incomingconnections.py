@@ -1,4 +1,7 @@
-""" Defines the incomingConnectionDaemon class
+"""
+@author: Lars Vonli(lars@vonli.no)
+See LICENSE for licensing information.
+
 """
 import threading
 import thread
@@ -74,7 +77,6 @@ def look_for_events(lconnections, orcbot):
     while 1:
         time.sleep(1)
         if(lconnections):
-            print "loopin'"
             #goes through connections and calls ircParse's process_data
             #on them, returning an Event object, or None
             events = map(lambda x:parse.process_data(x, orcbot), 

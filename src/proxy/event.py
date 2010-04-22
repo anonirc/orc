@@ -37,7 +37,6 @@ class Event:
 
     def apply_handler(self):
         """ The code that calls the event handler for the event type """
-        print "handlin'"
         tmp = self.event_type
         if hasattr(self, tmp):
             getattr(self, tmp)()
