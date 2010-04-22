@@ -239,6 +239,7 @@ class ORCBot:
         words = [p for p in re.split("( |\\\".*?\\\"|'.*?')", cmd) if p.strip()]
         # Set the default port in case the user does not specify one
         port = 6667
+        port = int(port)
         if(len(words) < 3):
             con.privmsg(nick, "You supplied too few arguments (at least"
             + " two needed), type 'help connect' for more info.")
@@ -262,12 +263,12 @@ class ORCBot:
         except IndexError:
             pass
         #words[1] is the nick
-        event.connect(words[1], server, port)
+        event.connect(nick, server, port, words[1])
 
 # Tell the user what happened
         if(words[2]):
             con.privmsg(nick, "Connecting you to " + server + 
-            " at port " + port +  ". You should now be able" + 
+            " at port " + str(port) +  ". You should now be able" + 
             "to join a channel. Do so as you normally would.")
             return
         #TODO: Implement nick functionality to the connect statement 
