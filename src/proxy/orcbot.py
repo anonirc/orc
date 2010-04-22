@@ -214,10 +214,10 @@ class ORCBot:
              
         elif (cmd=="help connect"):
             con.privmsg(nick, "Connects you to an IRC server of your choice.")
-            con.privmsg(nick, "The command may take one or two arguments, "
-                      + "servername and port. If no port is defined, " + 
+            con.privmsg(nick, "The command may take two or three arguments, "
+                      + "nick, servername and port. If no port is defined, " + 
                       "port 6667 is selected by default.")
-            con.privmsg(nick, "Example: 'connect irc.oftc.net 6667'")
+            con.privmsg(nick, "Example: 'connect mynick irc.oftc.net 6667'")
             
         else:
             con.privmsg(nick, "You wrote: '" + cmd + "' this is not a " + 
@@ -239,7 +239,6 @@ class ORCBot:
         words = [p for p in re.split("( |\\\".*?\\\"|'.*?')", cmd) if p.strip()]
         # Set the default port in case the user does not specify one
         port = 6667
-        port = int(port)
         if(len(words) < 3):
             con.privmsg(nick, "You supplied too few arguments (at least"
             + " two needed), type 'help connect' for more info.")
@@ -268,7 +267,7 @@ class ORCBot:
 # Tell the user what happened
         if(words[2]):
             con.privmsg(nick, "Connecting you to " + server + 
-            " at port " + str(port) +  ". You should now be able" + 
+            " at port " + str(port) +  ". You should now be able " + 
             "to join a channel. Do so as you normally would.")
             return
         #TODO: Implement nick functionality to the connect statement 
