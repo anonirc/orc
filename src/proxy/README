@@ -1,9 +1,12 @@
-This documentation is written by Runa Sandvik <runa.sandvik@gmail.com>.
+This documentation is written by Runa Sandvik <runa.sandvik@gmail.com>
+and John Hanssen Kolstad <johnhanssen@gmail.com>.
 
 To check out the code, write 'git clone
 git://github.com/anonirc/orc.git'.
 
 The code have been tested with Python 2.5.2
+
+To run, type 'python __init__.py'.
 
 1. General information about the scripts
 
@@ -55,38 +58,44 @@ The code have been tested with Python 2.5.2
 
     2.1 Install Python IRC Library
 
-    This library is intended to encapsulate the IRC protocol. The
-    library is available in both Debian and Ubuntu as python-irclib.
-    You can also download it from http://python-irclib.sourceforge.net/
+	This library is intended to encapsulate the IRC protocol. The
+	library is available in both Debian and Ubuntu as python-irclib.
+	You can also download it from
+	http://python-irclib.sourceforge.net/.
 
     2.2 Install MySQLdb
 
-    MySQLdb is an interface to the popular MySQL database server for
-    Python. The module is available in both Debian and Ubuntu as
-    python-mysqldb. You can also download it from
-    http://sourceforge.net/projects/mysql-python/.
+	MySQLdb is an interface to the popular MySQL database server for
+	Python. The module is available in both Debian and Ubuntu as
+	python-mysqldb. You can also download it from
+	http://sourceforge.net/projects/mysql-python/.
 
     2.3 Install GnuPGInterface
 
-    GnuPGInterface is a Python module for GnuPG. The module is
-    available in both Debian and Ubuntu as python-gnupginterface.
-    You can also download it from http://py-gnupg.sourceforge.net/.
+	GnuPGInterface is a Python module for GnuPG. The module is
+	available in both Debian and Ubuntu as python-gnupginterface.
+	You can also download it from http://py-gnupg.sourceforge.net/.
 
     2.4 Create a GPG key
 
-    If you do not have a GPG key, you will need to create one in order
-    for orcbot.py to validate the signed pseudonym. See Section 1 in the
-    HOWTO for the Pseudonym Manager for more information.
+	If you do not have a GPG key, you will need to create one in
+	order for orcbot.py to validate the signed pseudonym. See
+	Section 1 in the HOWTO for the Pseudonym Manager for more
+	information.
 
-	2.5	Install MySQL
-	
-	Install and set up MySQL from the package repository. Create a database with a 
-	descriptive name (for example "bandb") with a matching username/password.
+    2.5 Install MySQL
+
+	MySQL is a database management system. The software is available
+	from the package management system in both Debian and Ubuntu.
+	You can also download MySQL from
+	http://www.mysql.com/downloads/. Once the software is installed,
+	you can create a database with a descriptive name (for example
+	"bandb"), as well as a username and a password.
 
 3. Configuration
 
-	3.1 Set up the banlist table
-	
+    3.1 Set up the banlist table
+
 	Log in to the database, and create the following table:
 	
 	CREATE TABLE `bandb` (
@@ -100,8 +109,7 @@ The code have been tested with Python 2.5.2
 	  PRIMARY KEY  (`banid`)
 	) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 	
-	
-	3.2 Configure orc.conf
+    3.2 Configure orc.conf	
 
-	Configure the orc.conf file with the information relevant to your setup. Some 	 
-	default values have been provided. 
+	Configure the orc.conf file with the information relevant to
+	your setup. Some default values have been provided. 
