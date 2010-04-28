@@ -60,6 +60,20 @@ class Event:
         """Gets the data"""
         return self.data
     
+    def notice(self):
+        """ Handles notices. Checks for serverbans and handles those,
+        otherwise sends them on. No support for the difference between 
+        klines,  and glines(treats all as klines).  
+        Arguments:
+        - `self`:
+        """
+        if(self.data[1][0:18:] == "*** You are banned"):
+            username = SOCKET_TO_USERID[self.target]
+            user_pseudonym = VALIDATED_USERS.get_pseudonym(username)
+            network = self.source[1]
+            BANHANDLER.add_ban(10080, user_pseudonym, network, self.data[0], 1)
+        if(self.target):
+            self.target[0].sendall(self.message + "\r\n")
 
     def join(self):
         """Checks if a pseudonym is banned from a channel, if it is you are denied
