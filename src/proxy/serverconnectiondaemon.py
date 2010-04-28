@@ -32,12 +32,13 @@ class ServerConnectionDaemon(threading.Thread):
         while 1:
             time.sleep(1)
             #goes through connections and calls ircParse's
-            #on them, returning an Event object, or None            
-            event_list = map(lambda x:parse.process_data(x, None), CONNECTIONS.items())
-            event_list = filter(lambda x:x!=None, event_list)
-            for events in event_list:
-                for event in events:
-                    event.apply_handler()
+            #on them, returning an Event object, or None
+            if(CONNECTIONS):
+                event_list = map(lambda x:parse.process_data(x, None), CONNECTIONS.items())
+                event_list = filter(lambda x:x!=None, event_list)
+                for events in event_list:
+                    for event in events:
+                        event.apply_handler()
 
 
 def connect_to_server(nick, connection, server_address,
@@ -57,6 +58,19 @@ def connect_to_server(nick, connection, server_address,
     tmp = (tmp, server_address)
     CONNECTIONS[tmp] = connection
     return tmp
+
+def disconnect_from_server(server_socket_tuple):
+    """ Takes a server_socket,disconnects and deletes it from the
+    dictionary of connections.
+    
+    Arguments:
+    - `server_socket_tuple`:
+    """
+    #TODO: Also fix idents
+    server_socket_tuple[0].close()
+    del CONNECTIONS[server_socket_tuple]
+
+    
 
 def acceptIdentConnections():
     """ Accepts connections to 113 for ident responses
@@ -84,6 +98,7 @@ def respondToIdents():
             if(IDENT_RESPONSES.has_key((int(d[0][0]),int(d[0][1])))):
                 print IDENT_RESPONSES[(int(d[0][0]),int(d[0][1]))]
                 d[1][0].send(d[0][0]+d[0][1]+" :USERID:UNIX:"+IDENT_RESPONSES[(int(d[0][0]),int(d[0][1]))]+"\r\n")
+
 def _receiveOrNone(sock):
     try:
         tmp = (sock[0].recv(2**14), sock)

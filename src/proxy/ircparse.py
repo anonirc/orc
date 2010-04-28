@@ -32,13 +32,12 @@ def process_data(connection, orcbot_address):
         
     except socket.error, err:
         #Connection reset by peer
-        # print("Socket error")
-        # print errc
+        print("Socket error")
+        print err
         return None
     
-    if not new_data:
-        # Read nothing: broken send of some sort
-        return None
+    if (new_data == ''):
+        return [event.Event("connection_closed", connection[0], connection[1], orcbot_address, [],  [])]
     
     lines = _linesep_regexp.split(new_data)
    

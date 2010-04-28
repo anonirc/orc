@@ -7,6 +7,7 @@ import threading
 import thread
 import socket
 import time
+import select
 
 import ircparse as parse
 
@@ -81,11 +82,13 @@ def look_for_events(lconnections, orcbot):
             #on them, returning an Event object, or None
             events = map(lambda x:parse.process_data(x, orcbot), 
                                             lconnections.items())
+            print events
             #filters out the None's, in other words the ones without new data
             events = filter(lambda x:x!=None, events)
-            for socket_events in events:
-                for socket_event in socket_events:
-                    socket_event.apply_handler()
+            if(events): 
+                for socket_events in events:
+                    for socket_event in socket_events:
+                        socket_event.apply_handler()
             orcbot_events = parse.process_data((orcbot, None), orcbot)
             if orcbot_events:
                 for orcbot_event in orcbot_events:
@@ -95,3 +98,19 @@ def add_target(connection, target):
     '''
     '''
     CONNECTIONS[connection] = target
+
+def disconnect_user(connection_socket):
+    """Tries to find, disconnect and remoce the socket from the dictionary
+    ,  then returns the server connection if there is one.
+    
+    Arguments:
+    - `connection_socket`:
+    """
+    if CONNECTIONS.has_key(connection_socket):
+        tmp = CONNECTIONS[connection_socket]
+        connection_socket[0].close()
+        del CONNECTIONS[connection_socket]
+        return tmp
+    else:
+        return None
+        

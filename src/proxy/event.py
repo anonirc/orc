@@ -59,6 +59,15 @@ class Event:
     def get_data(self):
         """Gets the data"""
         return self.data
+
+    def connection_closed(self):
+        """ Handles connection closed events
+        
+        Arguments:
+        - `self`:
+        """
+        tmp = incoming.disconnect_user(self.source)
+        
     
     def notice(self):
         """ Handles notices. Checks for serverbans and handles those,
