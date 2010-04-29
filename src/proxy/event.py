@@ -67,6 +67,8 @@ class Event:
         - `self`:
         """
         tmp = incoming.disconnect_user(self.source)
+        if(tmp):
+            server.disconnect_from_server(tmp)
         
     
     def notice(self):
@@ -89,10 +91,10 @@ class Event:
         access. If not, sends the join message on to the remote IRC server
         """
         channel = self.data[0]
-        target_server = self.target[1]        
         user_pseudonym =  VALIDATED_USERS.get_pseudonym(SOCKET_TO_USERID.get(self.source, None))
         
-        if user_pseudonym:
+        if user_pseudonym and self.target:
+            target_server = self.target[1]        
             if(BANHANDLER.is_banned_from_channel(user_pseudonym, target_server, channel)):
                 self.source[0].send(":orcbot!~@localhost PRIVMSG "+SOCKET_TO_USERID[self.source]+" :You're banned from "+channel+"\r\n")
             elif(self.target):
