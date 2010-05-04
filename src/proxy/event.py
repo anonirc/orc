@@ -66,6 +66,9 @@ class Event:
         Arguments:
         - `self`:
         """
+        if(SOCKET_TO_USERID.has_key(self.source)):
+            VALIDATED_USERS.remove_user(self.source)
+        
         tmp = incoming.disconnect_user(self.source)
         if(tmp):
             server.disconnect_from_server(tmp)
