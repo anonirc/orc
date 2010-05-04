@@ -206,6 +206,9 @@ def connect(userid, server_address = "irc.oftc.net",
         incoming.add_target(user_connection, server_connection)
         server_connection[0].send("NICK " + nick + "\r\n")
         server_connection[0].send("USER " + userid + " orc orc :orc \r\n")
+    else:
+        user_connection.send(":orcbot!~@localhost PRIVMSG " + userid + " ORC was unable to connect to the server requested. Make sure you entered a valid servername\r\n")
+        
 
 def _char_list_to_string(char_list):
     """ Takes a list of chars and returns a string"""
