@@ -52,11 +52,14 @@ def connect_to_server(nick, connection, server_address,
     - port: port with which you wish to connect
     """
     tmp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    tmp.connect((server_address, port))
-    tmp.settimeout(.5)
-    IDENT_RESPONSES[(tmp.getsockname()[1], port)] = "identOCTETstring"
-    tmp = (tmp, server_address)
-    CONNECTIONS[tmp] = connection
+    try: 
+        tmp.connect((server_address, port))
+        tmp.settimeout(.5)
+        IDENT_RESPONSES[(tmp.getsockname()[1], port)] = "identOCTETstring"
+        tmp = (tmp, server_address)
+        CONNECTIONS[tmp] = connection
+    except e:
+        tmp =  None
     return tmp
 
 def disconnect_from_server(server_socket_tuple):

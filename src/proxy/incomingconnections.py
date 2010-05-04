@@ -7,7 +7,6 @@ import threading
 import thread
 import socket
 import time
-import select
 
 import ircparse as parse
 
