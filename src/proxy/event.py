@@ -202,9 +202,10 @@ def connect(userid, server_address = "irc.oftc.net",
                                                   server_address,
                                                   password,
                                                   port)
-    incoming.add_target(user_connection, server_connection)
-    server_connection[0].send("NICK " + nick + "\r\n")
-    server_connection[0].send("USER " + userid + " orc orc :orc \r\n")
+    if(server_connection):
+        incoming.add_target(user_connection, server_connection)
+        server_connection[0].send("NICK " + nick + "\r\n")
+        server_connection[0].send("USER " + userid + " orc orc :orc \r\n")
 
 def _char_list_to_string(char_list):
     """ Takes a list of chars and returns a string"""
