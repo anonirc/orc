@@ -165,6 +165,8 @@ class ORCBot:
         timediff = time.time() - timesigned
         minutes = timediff / 60
         print timediff
+        print "duration"
+        print self.pseudonym_dur
         
         if ((minutes > 0) and (minutes > self.pseudonym_dur)):
             print "Returning true"
