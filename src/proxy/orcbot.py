@@ -164,7 +164,7 @@ class ORCBot:
                     time.strptime(gpg_output[20:47], "%a %d %b %Y %H:%M:%S %p"))
         timediff = time.time() - timesigned
         minutes = timediff / 60
-        print timediff
+        print minutes
         print "duration"
         print self.pseudonym_dur
         
