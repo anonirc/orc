@@ -31,9 +31,6 @@ def process_data(connection, orcbot_address):
         print new_data
         
     except socket.error, err:
-        #Connection reset by peer
-        print("Socket error")
-        print err
         return None
     
     if (new_data == ''):
