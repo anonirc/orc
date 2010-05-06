@@ -7,6 +7,7 @@ See LICENSE for licensing information.
 import socket
 import re
 import random
+import time
 import serverconnectiondaemon as server
 import incomingconnections as incoming
 
@@ -18,6 +19,10 @@ ALPHABET = "abcdefghijklmnopqrstuvwxABCDEFGHIJKLMNOPQRSTUVWX"
 USERID_LENGTH = 8
 BANHANDLER = None
 VALIDATED_USERS = None
+#Holds the time to wait between connections to server. To avoid being
+#denied access to some IRCd's.   Given in seconds
+QUEUE_TIME = 0
+CONNECTION_TIMESTAMPS = {}
 
 class Event:
     """ Holds the type and handler function for irc events """
@@ -194,21 +199,27 @@ def connect(userid, server_address = "irc.oftc.net",
     ''' Connects a user to an IRC server and handles initial user
     registration
     '''
+    if(CONNECTION_TIMESTAMPS and CONNECTION_TIMESTAMPS.has_key(server_address)):
+        timestamp = CONNECTION_TIMESTAMPS[server_address]
+        if(timestamp + QUEUE_TIME >= time.time()):
+            time.sleep(QUEUE_TIME + timestamp - time.time())
+            
     if(not nick):
         nick = userid
-    user_connection = USERID_TO_SOCKET[userid]
-    server_connection = server.connect_to_server( userid,
-                                                  USERID_TO_SOCKET[userid],
-                                                  server_address,
-                                                  password,
-                                                  port)
-    if(server_connection):
-        incoming.add_target(user_connection, server_connection)
-        server_connection[0].send("NICK " + nick + "\r\n")
-        server_connection[0].send("USER " + userid + " orc orc :orc \r\n")
-    else:
-        user_connection.send(":orcbot!~@localhost PRIVMSG " + userid + " ORC was unable to connect to the server requested. Make sure you entered a valid servername\r\n")
-        
+        user_connection = USERID_TO_SOCKET[userid]
+        server_connection = server.connect_to_server( userid,
+                                                      USERID_TO_SOCKET[userid],
+                                                      server_address,
+                                                      password,
+                                                      port)
+        if(server_connection):
+            incoming.add_target(user_connection, server_connection)
+            server_connection[0].send("NICK " + nick + "\r\n")
+            server_connection[0].send("USER " + userid + " orc orc :orc \r\n")
+            CONNECTION_TIMESTAMPS[server_address] = time.time()
+        else:
+            user_connection.send(":orcbot!~@localhost PRIVMSG " + userid + " ORC was unable to connect to the server requested. Make sure you entered a valid servername\r\n")
+
 
 def _char_list_to_string(char_list):
     """ Takes a list of chars and returns a string"""
