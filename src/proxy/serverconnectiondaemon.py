@@ -75,7 +75,7 @@ def disconnect_from_server(server_socket_tuple):
 
     
 
-def acceptIdentConnections():
+def accept_ident_connections():
     """ Accepts connections to 113 for ident responses
     """
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -89,12 +89,12 @@ def acceptIdentConnections():
         finally:
             time.sleep(1)
             
-def respondToIdents():
+def respond_to_ident():
     """ Listens to the IDENT_CONNECTIONS, and responds
     to ident requests
     """
     if(IDENT_CONNECTIONS):
-        data = map(_receiveOrNone, IDENT_CONNECTIONS)
+        data = map(_receive_or_none, IDENT_CONNECTIONS)
         data = filter(lambda x:x!=None, data)
         for d in data:
             d[0].strip().split(",")
@@ -102,7 +102,7 @@ def respondToIdents():
                 print IDENT_RESPONSES[(int(d[0][0]),int(d[0][1]))]
                 d[1][0].send(d[0][0]+d[0][1]+" :USERID:UNIX:"+IDENT_RESPONSES[(int(d[0][0]),int(d[0][1]))]+"\r\n")
 
-def _receiveOrNone(sock):
+def _receive_or_none(sock):
     try:
         tmp = (sock[0].recv(2**14), sock)
         return tmp
