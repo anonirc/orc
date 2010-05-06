@@ -156,20 +156,12 @@ class ORCBot:
         Takes the output of a gpg verification attempt and returns True
         or False depending on the proxy configuration of pseudonym durations.
         '''
-        print "Timeout stuff"
-        print gpg_output[20:47]
-        print time.strptime(gpg_output[20:47], "%a %d %b %Y %H:%M:%S %p")
-        
         timesigned = time.mktime(
                     time.strptime(gpg_output[20:47], "%a %d %b %Y %H:%M:%S %p"))
         timediff = time.time() - timesigned
         minutes = timediff / 60
-        print minutes
-        print "duration"
-        print self.pseudonym_dur
         
         if ((minutes > 0) and (minutes > self.pseudonym_dur)):
-            print "Returning true"
             return True
         return False
 
