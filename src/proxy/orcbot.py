@@ -167,6 +167,7 @@ class ORCBot:
         print timediff
         
         if ((minutes > 0) and (minutes > self.pseudonym_dur)):
+            print "Returning true"
             return True
         return False
 
