@@ -99,7 +99,7 @@ def add_target(connection, target):
     CONNECTIONS[connection] = target
 
 def disconnect_user(connection_socket):
-    """Tries to find, disconnect and remoce the socket from the dictionary
+    """Tries to find, disconnect and remove the socket from the dictionary
     ,  then returns the server connection if there is one.
     
     Arguments:
