@@ -58,7 +58,7 @@ def connect_to_server(nick, connection, server_address,
         IDENT_RESPONSES[(tmp.getsockname()[1], port)] = "identOCTETstring"
         tmp = (tmp, server_address)
         CONNECTIONS[tmp] = connection
-    except e:
+    except socket.error, e:
         tmp =  None
     return tmp
 

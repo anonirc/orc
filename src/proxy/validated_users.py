@@ -25,4 +25,5 @@ class ValidatedUsers():
         - `self`:
         - `nick`:
         """
-        del self.dict_nick_to_pseudonym[nick]
+        if(self.dict_nick_to_pseudonym.has_key(nick)):
+            del self.dict_nick_to_pseudonym[nick]
