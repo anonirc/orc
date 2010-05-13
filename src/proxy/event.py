@@ -92,6 +92,9 @@ class Event:
             user_pseudonym = VALIDATED_USERS.get_pseudonym(username)
             network = self.source[1]
             BANHANDLER.add_ban(10080, user_pseudonym, network, self.data[0], 1)
+            self.message = self.message + "\r\n :orcbot!@localhost PRIVMSG "+SOCKET_TO_USERID[self.source]+
+                 " :You've been banned from this server"
+            
         self.send()
 
     def join(self):
