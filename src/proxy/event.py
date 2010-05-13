@@ -78,10 +78,7 @@ class Event:
                 server.disconnect_from_server(tmp)
         elif(server.CONNECTIONS.has_key(self.source)):
             tmp = server.disconnect_from_server(self.source)
-            incoming.disconnect_user(tmp)
-        
-            
-        
+            incoming.disconnect_user(tmp)        
     
     def notice(self):
         """ Handles notices. Checks for serverbans and handles those,
