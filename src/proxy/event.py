@@ -91,8 +91,7 @@ class Event:
             user_pseudonym = VALIDATED_USERS.get_pseudonym(username)
             network = self.source[1]
             BANHANDLER.add_ban(10080, user_pseudonym, network, self.data[0], 1)
-        if(self.target):
-            self.target[0].sendall(self.message + "\r\n")
+        self.send()
 
     def join(self):
         """Checks if a pseudonym is banned from a channel, if it is you are denied
@@ -108,9 +107,7 @@ class Event:
             elif(self.target):
                 self.message = self.message +"\r\n"
                 self.target[0].sendall(self.message)
-        elif(self.target):
-            self.message = self.message +"\r\n"
-            self.target[0].sendall(self.message)
+        self.send()
     
     def ping(self):
         ''' 
@@ -123,19 +120,13 @@ class Event:
             self.message = "PONG " + self.data[0] + "\r\n"
             self.source[0].send(self.message)
         # If user connected to another IRC server, forward the ping.
-        elif(self.target):
-            self.target[0].send(self.message + "\r\n")
+        self.send()
         
         
     def privmsg(self):
         """ If a privmsg is for orcbot, it's target is set to orcbot. The message
         is then sent to event.target, unless it doesnt have one
         """
-        # print "Raw message"
-#         print self.message
-#         print "****Source**"
-#         print self.source
-        #if message is for orcbot, set orcbot as target
         if(self.data[0]=="orcbot"):
             print "target is orcbot"
             self.target = self.orcbot_socket
@@ -144,39 +135,25 @@ class Event:
             print "source is orcbot"
             self.target = USERID_TO_SOCKET[self.data[0]]
             self.message = ":orcbot!~@localhost " + self.message
-        self.message = self.message + "\r\n"
-       #  print "*******target**"
-#         print self.target
-#         print "*******message to send"
-#         print self.message
-        if(self.target):
-            try:
-                self.target[0].sendall(self.message)
-            except socket.error, err:
-                print "can't send"
-                print err
+        self.send()
                 
     def mode(self):
         """Detect if a mode message contains a ban
         for the current user, if so, adds it to the ban database, before
         it passes the message on
         """
-        if(len(self.data)==3):
-            print self.data
-            if re.match("\+b", self.data[1]):
-                #TODO: Currently you'll get banned if anyone with your username is banned
-                #TODO: Detect the difference between klines and channelbans
-                username = SOCKET_TO_USERID[self.target]                
-                banned_user = self.data[2].split("!")[1].split("@")[0].strip("*").strip("~")
-                if(username == banned_user):
-                    print "about to be BANNED", username, "   ", banned_user
-                    user_pseudonym = VALIDATED_USERS.get_pseudonym(username)
-                    network = self.source[1]
-                    BANHANDLER.add_ban(10080, user_pseudonym, network, self.data[0], 0)
-        if(self.target):
-            self.message = self.message +"\r\n"
-            self.target[0].send(self.message)
-
+        # removed detection of channelbans per request. Should be in config
+        # if(len(self.data)==3):
+        #     print self.data
+        #     if re.match("\+b", self.data[1]):
+        #         username = SOCKET_TO_USERID[self.target]                
+        #         banned_user = self.data[2].split("!")[1].split("@")[0].strip("*").strip("~")
+        #         if(username == banned_user):
+        #             print "about to be BANNED", username, "   ", banned_user
+        #             user_pseudonym = VALIDATED_USERS.get_pseudonym(username)
+        #             network = self.source[1]
+        #             BANHANDLER.add_ban(10080, user_pseudonym, network, self.data[0], 0)
+        self.send()
 
     def nick(self):
         """ Sets a userid when the client tries to register with the proxy for the first time.
@@ -189,9 +166,18 @@ class Event:
                 new_userid = _char_list_to_string(random.sample(ALPHABET, USERID_LENGTH))
             USERID_TO_SOCKET[new_userid] = self.source
             SOCKET_TO_USERID[self.source] = new_userid
-        elif(self.target):
-            self.message = self.message +"\r\n"
-            self.target[0].send(self.message)
+        self.send()
+
+    def send(self):
+        """ Tries to send message to target
+        """
+        if(self.target):
+             try:
+                 self.message = self.message +"\r\n"
+                 self.target[0].send(self.message)
+             except socket.error, err:
+                 print err
+        
             
 
 def connect(userid, server_address = "irc.oftc.net",
