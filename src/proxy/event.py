@@ -73,10 +73,14 @@ class Event:
         """
         if(SOCKET_TO_USERID.has_key(self.source)):
             VALIDATED_USERS.remove_user(self.source)
+            tmp = incoming.disconnect_user(self.source)
+            if(tmp):
+                server.disconnect_from_server(tmp)
+        elif(server.CONNECTIONS.has_key(self.source)):
+            tmp = server.disconnect_from_server(self.source)
+            incoming.disconnect_user(tmp)
         
-        tmp = incoming.disconnect_user(self.source)
-        if(tmp):
-            server.disconnect_from_server(tmp)
+            
         
     
     def notice(self):

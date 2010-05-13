@@ -71,7 +71,10 @@ def disconnect_from_server(server_socket_tuple):
     """
     #TODO: Also fix idents
     server_socket_tuple[0].close()
-    del CONNECTIONS[server_socket_tuple]
+    if(CONNECTIONS.has_key(server_socket_tuple)):
+        tmp = CONNECTIONS[server_socket_tuple]
+        del CONNECTIONS[server_socket_tuple]
+    return tmp
 
     
 
