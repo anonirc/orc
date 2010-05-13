@@ -177,8 +177,6 @@ class Event:
                  self.target[0].send(self.message)
              except socket.error, err:
                  print err
-        
-            
 
 def connect(userid, server_address = "irc.oftc.net",
             port = 6667,nick = None, password = None):
