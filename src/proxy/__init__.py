@@ -25,7 +25,7 @@ OUTPUT = PROCESS.read()
 if("root" in OUTPUT):
     print "root permissions not needed, running as www-data."
     # On the test system, the uid of www-data is 33 (and on most Debian
-    # systems. 
+    # systems.
     os.setuid(33)
 
 # Reading the config from file
@@ -36,7 +36,7 @@ CONFIG.read('orc.conf')
 print "Starting receiver.."
 try:
     RECEIVER = incoming.IncomingConnectionDaemon()
-    RECEIVER.init(CONFIG.get('ORC', 'icd_host'), 
+    RECEIVER.init(CONFIG.get('ORC', 'icd_host'),
                   int(CONFIG.get('ORC', 'icd_port')))
 except ValueError:
     print ("ERROR: Accessing the options for the receiver failed, " +
@@ -55,8 +55,8 @@ SENDER.start()
 print "Starting banhandler.."
 try:
     BH = banhandler.BanHandler(CONFIG.get('ORC', 'bh_host'),
-                               CONFIG.get('ORC', 'bh_user'), 
-                               CONFIG.get('ORC', 'bh_passwd'), 
+                               CONFIG.get('ORC', 'bh_user'),
+                               CONFIG.get('ORC', 'bh_passwd'),
                                CONFIG.get('ORC', 'bh_db'))
     #setting the reference to the banhandler in event
     event.BANHANDLER = BH
@@ -68,17 +68,17 @@ except _mysql_exceptions.OperationalError:
     print ("ERROR: Accessing the options for the banhandler failed, " +
            "please review your orc.conf file.")
     sys.exit(1)
-    
+
 print "Starting bot.."
 try:
     BOT = orcbot.ORCBot(# Server info
                         (CONFIG.get('ORC', 'orcbot_server'),
                          (CONFIG.get('ORC', 'orcbot_port'))),
                          # GPG
-                         (CONFIG.get('ORC', 'orcbot_keyring'), 
+                         (CONFIG.get('ORC', 'orcbot_keyring'),
                           CONFIG.get('ORC', 'orcbot_keyid')),
-                          # BanHandler and URI of PM 
-                          BH, 
+                          # BanHandler and URI of PM
+                          BH,
                           CONFIG.get('ORC', 'orcbot_pmname'),
                           CONFIG.get('ORC', 'pseudonym_dur')
                           )

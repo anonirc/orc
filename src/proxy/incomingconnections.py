@@ -27,7 +27,7 @@ class IncomingConnectionDaemon(threading.Thread):
         self.backlog = 10
         self.size = 1024
         threading.Thread.__init__(self)
-    
+
     def run(self):
         """ Starts listening to a socket and adds
         incoming connections to the connections array
@@ -40,7 +40,7 @@ class IncomingConnectionDaemon(threading.Thread):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.bind((self.host, self.port))
         sock.listen(self.backlog)
-        
+
         orcbot = sock.accept()
         orcbot[0].settimeout(.5)
         print "OrcBot connected"
@@ -48,7 +48,7 @@ class IncomingConnectionDaemon(threading.Thread):
         #starts the method that looks for events in connections
         spawn_look_for_events(CONNECTIONS, orcbot)
         #first connection should be from orcbot
-        
+
         while 1:
             try:
                 tmp = sock.accept()
@@ -59,7 +59,7 @@ class IncomingConnectionDaemon(threading.Thread):
                 print("connected")
             finally:
                 time.sleep(1)
-                
+
 def spawn_look_for_events(lconnections, orcbot):
     """Starts the look_for_events function in  new thread
     and passes connections to it
@@ -68,7 +68,7 @@ def spawn_look_for_events(lconnections, orcbot):
         thread.start_new_thread(look_for_events, (lconnections, orcbot))
     except :
         print "Error: unable to start thread"
-        
+
 def look_for_events(lconnections, orcbot):
     """
     Looks for new data in all connections
@@ -79,12 +79,12 @@ def look_for_events(lconnections, orcbot):
         if(lconnections):
             #goes through connections and calls ircParse's process_data
             #on them, returning an Event object, or None
-            events = map(lambda x:parse.process_data(x, orcbot), 
+            events = map(lambda x:parse.process_data(x, orcbot),
                                             lconnections.items())
             print events
             #filters out the None's, in other words the ones without new data
             events = filter(lambda x:x!=None, events)
-            if(events): 
+            if(events):
                 for socket_events in events:
                     for socket_event in socket_events:
                         socket_event.apply_handler()
@@ -92,7 +92,7 @@ def look_for_events(lconnections, orcbot):
             if orcbot_events:
                 for orcbot_event in orcbot_events:
                     orcbot_event.apply_handler()
-        
+
 def add_target(connection, target):
     '''
     '''
@@ -101,7 +101,7 @@ def add_target(connection, target):
 def disconnect_user(connection_socket):
     """Tries to find, disconnect and remove the socket from the dictionary
     ,  then returns the server connection if there is one.
-    
+
     Arguments:
     - `connection_socket`:
     """
@@ -112,4 +112,3 @@ def disconnect_user(connection_socket):
         return tmp
     else:
         return None
-        

@@ -5,7 +5,7 @@
 # See LICENSE for licensing information.
 #
 # This script will ask the user for the contents of file.asc,
-# then try to verify the signature using GPG. 
+# then try to verify the signature using GPG.
 
 # The with statement is not available in Python 2.5, so import it
 from __future__ import with_statement
@@ -70,13 +70,13 @@ def verify():
     # Check if the signature is valid. Do not accept a bad signature.
     if "BAD" in signature:
         print "Sorry, this signature is not valid"
-    
+
     # Accept a good signature if it is signed by the right key ID. If it
     # is a good signature, and the right key ID have been used, check
     # when the signature was made.
     if "Good" in signature and keyid in s[14]:
             print "Good signature made", s[4], s[5], s[6], s[7], s[8], s[9]
-    
+
 # Main function
 if __name__ == "__main__":
     verify()

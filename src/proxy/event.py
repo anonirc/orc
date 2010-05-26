@@ -38,7 +38,7 @@ class Event:
         self.data = data
         self.socket = source
         self.message = raw
-        self.orcbot_socket = orcbot  
+        self.orcbot_socket = orcbot
 
     def apply_handler(self):
         """ The code that calls the event handler for the event type """
@@ -52,22 +52,22 @@ class Event:
     def get_type(self):
         """ Gets the type of an event"""
         return self.event_type
-   
+
     def get_source(self):
         """ Gets the source of an event"""
         return self.source
-   
+
     def get_target(self):
         """Gets the target"""
         return self.target
-   
+
     def get_data(self):
         """Gets the data"""
         return self.data
 
     def connection_closed(self):
         """ Handles connection closed events
-        
+
         Arguments:
         - `self`:
         """
@@ -78,12 +78,12 @@ class Event:
                 server.disconnect_from_server(tmp)
         elif(server.CONNECTIONS.has_key(self.source)):
             tmp = server.disconnect_from_server(self.source)
-            incoming.disconnect_user(tmp)        
-    
+            incoming.disconnect_user(tmp)
+
     def notice(self):
         """ Handles notices. Checks for serverbans and handles those,
-        otherwise sends them on. No support for the difference between 
-        klines,  and glines(treats all as klines).  
+        otherwise sends them on. No support for the difference between
+        klines,  and glines(treats all as klines).
         Arguments:
         - `self`:
         """
@@ -93,7 +93,7 @@ class Event:
             network = self.source[1]
             BANHANDLER.add_ban(10080, user_pseudonym, network, self.data[0], 1)
             self.message = self.message + "\r\n :orcbot!@localhost PRIVMSG "+SOCKET_TO_USERID[self.source]+" :You've been banned from this server"
-            
+
         self.send()
 
     def join(self):
@@ -102,18 +102,18 @@ class Event:
         """
         channel = self.data[0]
         user_pseudonym =  VALIDATED_USERS.get_pseudonym(SOCKET_TO_USERID.get(self.source, None))
-        
+
         if user_pseudonym and self.target:
-            target_server = self.target[1]        
+            target_server = self.target[1]
             if(BANHANDLER.is_banned_from_channel(user_pseudonym, target_server, channel)):
                 self.source[0].send(":orcbot!~@localhost PRIVMSG "+SOCKET_TO_USERID[self.source]+" :You're banned from "+channel+"\r\n")
             elif(self.target):
                 self.message = self.message +"\r\n"
                 self.target[0].sendall(self.message)
         self.send()
-    
+
     def ping(self):
-        ''' 
+        '''
         If irssi or other client tries to ping ORC while
         the user is not connected, return a pong.
         Else some clients disconnect.
@@ -124,8 +124,8 @@ class Event:
             self.source[0].send(self.message)
         # If user connected to another IRC server, forward the ping.
         self.send()
-        
-        
+
+
     def privmsg(self):
         """ If a privmsg is for orcbot, it's target is set to orcbot. The message
         is then sent to event.target, unless it doesnt have one
@@ -139,7 +139,7 @@ class Event:
             self.target = USERID_TO_SOCKET[self.data[0]]
             self.message = ":orcbot!~@localhost " + self.message
         self.send()
-                
+
     def mode(self):
         """Detect if a mode message contains a ban
         for the current user, if so, adds it to the ban database, before
@@ -149,7 +149,7 @@ class Event:
         if(len(self.data)==3):
             print self.data
             if re.match("\+b", self.data[1]):
-                username = SOCKET_TO_USERID[self.target]                
+                username = SOCKET_TO_USERID[self.target]
                 banned_user = self.data[2].split("!")[1].split("@")[0].strip("*").strip("~")
                 if(username == banned_user):
                     print "about to be BANNED", username, "   ", banned_user
@@ -190,7 +190,7 @@ def connect(userid, server_address = "irc.oftc.net",
         timestamp = CONNECTION_TIMESTAMPS[server_address]
         if(timestamp + QUEUE_TIME >= time.time()):
             time.sleep(QUEUE_TIME + timestamp - time.time())
-            
+
     if(not nick):
         nick = userid
     user_connection = USERID_TO_SOCKET[userid]

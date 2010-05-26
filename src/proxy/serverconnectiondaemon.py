@@ -52,7 +52,7 @@ def connect_to_server(nick, connection, server_address,
     - port: port with which you wish to connect
     """
     tmp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try: 
+    try:
         tmp.connect((server_address, port))
         tmp.settimeout(.5)
         IDENT_RESPONSES[(tmp.getsockname()[1], port)] = "identOCTETstring"
@@ -65,7 +65,7 @@ def connect_to_server(nick, connection, server_address,
 def disconnect_from_server(server_socket_tuple):
     """ Takes a server_socket,disconnects and deletes it from the
     dictionary of connections.
-    
+
     Arguments:
     - `server_socket_tuple`:
     """
@@ -76,7 +76,7 @@ def disconnect_from_server(server_socket_tuple):
         del CONNECTIONS[server_socket_tuple]
     return tmp
 
-    
+
 
 def accept_ident_connections():
     """ Accepts connections to 113 for ident responses
@@ -91,7 +91,7 @@ def accept_ident_connections():
             IDENT_CONNECTIONS.append(tmp)
         finally:
             time.sleep(1)
-            
+
 def respond_to_ident():
     """ Listens to the IDENT_CONNECTIONS, and responds
     to ident requests

@@ -29,28 +29,28 @@ def process_data(connection, orcbot_address):
     try:
         new_data = connection[0][0].recv(2**14)
         print new_data
-        
+
     except socket.error, err:
         return None
-    
+
     if (new_data == ''):
         return [event.Event("connection_closed", connection[0], connection[1], orcbot_address, [],  [])]
-    
+
     lines = _linesep_regexp.split(new_data)
-   
+
     prefix = None
     command = None
     arguments = None
-    
+
     for line in lines:
         if not line:
             continue
 
         msg = _rfc_1459_command_regexp.match(line)
-        
+
         if msg.group("prefix"):
             prefix = msg.group("prefix")
-          
+
         if msg.group("command"):
             command = msg.group("command").lower()
 
@@ -62,6 +62,6 @@ def process_data(connection, orcbot_address):
 
         # Translate numerics into more readable strings.
         if command in numeric_events:
-            command = numeric_events[command]     
+            command = numeric_events[command]
         event_list.append(event.Event(command, connection[0], connection[1], orcbot_address, line, arguments))
     return event_list
