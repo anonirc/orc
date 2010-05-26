@@ -92,8 +92,7 @@ class Event:
             user_pseudonym = VALIDATED_USERS.get_pseudonym(username)
             network = self.source[1]
             BANHANDLER.add_ban(10080, user_pseudonym, network, self.data[0], 1)
-            self.message = self.message + "\r\n :orcbot!@localhost PRIVMSG "+SOCKET_TO_USERID[self.source]+
-                 " :You've been banned from this server"
+            self.message = self.message + "\r\n :orcbot!@localhost PRIVMSG "+SOCKET_TO_USERID[self.source]+" :You've been banned from this server"
             
         self.send()
 
@@ -146,17 +145,17 @@ class Event:
         for the current user, if so, adds it to the ban database, before
         it passes the message on
         """
-        # removed detection of channelbans per request. Should be in config
-        # if(len(self.data)==3):
-        #     print self.data
-        #     if re.match("\+b", self.data[1]):
-        #         username = SOCKET_TO_USERID[self.target]                
-        #         banned_user = self.data[2].split("!")[1].split("@")[0].strip("*").strip("~")
-        #         if(username == banned_user):
-        #             print "about to be BANNED", username, "   ", banned_user
-        #             user_pseudonym = VALIDATED_USERS.get_pseudonym(username)
-        #             network = self.source[1]
-        #             BANHANDLER.add_ban(10080, user_pseudonym, network, self.data[0], 0)
+        #TODO: detection of channelbans be optional and moved into config
+        if(len(self.data)==3):
+            print self.data
+            if re.match("\+b", self.data[1]):
+                username = SOCKET_TO_USERID[self.target]                
+                banned_user = self.data[2].split("!")[1].split("@")[0].strip("*").strip("~")
+                if(username == banned_user):
+                    print "about to be BANNED", username, "   ", banned_user
+                    user_pseudonym = VALIDATED_USERS.get_pseudonym(username)
+                    network = self.source[1]
+                    BANHANDLER.add_ban(10080, user_pseudonym, network, self.data[0], 0)
         self.send()
 
     def nick(self):
